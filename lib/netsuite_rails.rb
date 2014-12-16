@@ -1,0 +1,1 @@
+require 'netsuite_rails/netsuite_rails'
