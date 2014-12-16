@@ -6,7 +6,13 @@ module NetsuiteRails
   module Generators
     class InstallGenerator < Rails::Generators::Base
       # http://stackoverflow.com/questions/4141739/generators-and-migrations-in-plugins-rails-3
-      include ActiveRecord::Generators::Migration
+
+      if Rails::VERSION::STRING.start_with?('3.2')
+        include Rails::Generators::Migration
+        extend ActiveRecord::Generators::Migration
+      else
+        include ActiveRecord::Generators::Migration
+      end
 
       source_root File.expand_path('../templates', __FILE__)
 
