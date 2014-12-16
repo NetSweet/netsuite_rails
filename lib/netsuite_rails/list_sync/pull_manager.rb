@@ -12,7 +12,7 @@ module NetSuiteRails
 
         def process_results(klass, opts, list)
           list.each do |custom_value|
-            local_record = klass.find_or_initialize_by(netsuite_id: custom_value.attributes[:value_id])
+            local_record = klass.where(netsuite_id: custom_value.attributes[:value_id]).first_or_initialize
 
             if local_record.respond_to?(:value=)
               local_record.value = custom_value.attributes[:value]

@@ -118,7 +118,7 @@ module NetSuiteRails
         end
 
         def process_search_result_item(klass, opts, netsuite_record)
-          local_record = klass.find_or_initialize_by(netsuite_id: netsuite_record.internal_id)
+          local_record = klass.where(netsuite_id: netsuite_record.internal_id).first_or_initialize
 
           # when importing lots of records during an import_all skipping imported records is important
           return if opts[:skip_existing] == true && !local_record.new_record?
