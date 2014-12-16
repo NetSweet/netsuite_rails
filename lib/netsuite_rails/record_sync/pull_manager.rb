@@ -105,26 +105,30 @@ module NetSuiteRails
               filtered_netsuite_id_list = batch.map(&:internal_id)
 
               if opts[:skip_existing] == true
-                filtered_netsuite_id_list.reject! { |netsuite_id| synced_netsuite_list.include?(netsuite_id) }
+                filtered_netsuite_id_list.  reject! { |netsuite_id| synced_netsuite_list.include?(netsuite_id) }
               end
 
               opts[:netsuite_record_class].get_list(list: batch.map(&:internal_id))
             else
               batch
             end.each do |netsuite_record|
-              local_record = klass.find_or_initialize_by(netsuite_id: netsuite_record.internal_id)
-
-              # when importing lots of records during an import_all skipping imported records is important
-              next if opts[:skip_existing] == true && !local_record.new_record?
-
-              local_record.netsuite_extract_from_record(netsuite_record)
-
-              # TODO optionally throw fatal errors; we want to skip fatal errors on intial import
-
-              unless local_record.save
-                Rails.logger.error "NetSuite: Error pulling record #{klass} NS ID #{netsuite_record.internal_id} #{local_record.errors.full_messages}"
-              end
+              self.process_search_result_item(klass, opts, netsuite_record)
             end
+          end
+        end
+
+        def process_search_result_item(klass, opts, netsuite_record)
+          local_record = klass.find_or_initialize_by(netsuite_id: netsuite_record.internal_id)
+
+          # when importing lots of records during an import_all skipping imported records is important
+          return if opts[:skip_existing] == true && !local_record.new_record?
+
+          local_record.netsuite_extract_from_record(netsuite_record)
+
+          # TODO optionally throw fatal errors; we want to skip fatal errors on intial import
+
+          unless local_record.save
+            Rails.logger.error "NetSuite: Error pulling record #{klass} NS ID #{netsuite_record.internal_id} #{local_record.errors.full_messages}"
           end
         end
 
