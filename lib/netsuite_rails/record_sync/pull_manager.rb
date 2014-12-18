@@ -33,7 +33,19 @@ module NetSuiteRails
         def poll_criteria(klass, opts)
           # saved_search_id: 123
 
-          # TODO conditionally add criteria[:saved]
+          search_criteria = {
+            criteria: {
+              basic: poll_basic_criteria(klass, opts)
+            }
+          }
+
+          saved_search_id = opts[:saved_search_id] || klass.netsuite_sync_options[:saved_search_id]
+
+          if saved_search_id
+            search_criteria[:criteria][:saved] = saved_search_id
+          end
+
+
           # TODO if SS force one of the columns to be an internal ID so we can retrieve the records via getAll
 
           # columns: [
@@ -42,11 +54,7 @@ module NetSuiteRails
           #   ],
           # ],
 
-          {
-            criteria: {
-              basic: poll_basic_criteria(klass, opts),
-            }
-          }
+          search_criteria
         end
 
         def poll_basic_criteria(klass, opts)
