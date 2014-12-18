@@ -101,7 +101,7 @@ module NetSuiteRails
 
           # TODO need to improve the conditional here to match the get_list call conditional belo
           if opts[:import_all] && opts[:skip_existing]
-            synced_netsuite_list = self.pluck(:netsuite_id)
+            synced_netsuite_list = klass.pluck(:netsuite_id)
           end
           
           search.results_in_batches do |batch|
@@ -113,7 +113,7 @@ module NetSuiteRails
               filtered_netsuite_id_list = batch.map(&:internal_id)
 
               if opts[:skip_existing] == true
-                filtered_netsuite_id_list.  reject! { |netsuite_id| synced_netsuite_list.include?(netsuite_id) }
+                filtered_netsuite_id_list.reject! { |netsuite_id| synced_netsuite_list.include?(netsuite_id) }
               end
 
               opts[:netsuite_record_class].get_list(list: batch.map(&:internal_id))
