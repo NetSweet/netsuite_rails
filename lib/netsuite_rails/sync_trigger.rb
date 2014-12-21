@@ -45,7 +45,7 @@ module NetSuiteRails
       end
 
       def record_pull_trigger(local)
-        return if NetSuiteRails::Configuration.netsuite_push_disabled
+        return if NetSuiteRails::Configuration.netsuite_pull_disabled
 
         record_trigger_action(local, :netsuite_pull)
       end
@@ -75,9 +75,10 @@ module NetSuiteRails
         end
 
         # TODO need to pass off the credentials to the NS push command
-        # TODO force sync mode when in a background process
+        
+        # You can force sync mode in different envoirnments with the global configuration variables
 
-        if sync_options[:mode] == :sync || 1
+        if sync_options[:mode] == :sync || NetSuiteRails::Configuration.netsuite_sync_mode == :sync
           local.send(action)
         else
           # TODO support the rails4 DJ implementation
