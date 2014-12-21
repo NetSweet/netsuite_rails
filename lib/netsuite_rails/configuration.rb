@@ -34,5 +34,13 @@ module NetSuiteRails
       end
     end
 
+    def netsuite_instance_time_zone_offset(zone_offset = nil)
+      if zone_offset.nil?
+        attributes[:zone_offset] ||= -8
+      else
+        attributes[:zone_offset] = zone_offset
+      end
+    end
+
   end
 end
