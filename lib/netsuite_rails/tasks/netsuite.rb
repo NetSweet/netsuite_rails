@@ -14,7 +14,19 @@ namespace :netsuite do
     # need to eager load to ensure that all classes are loaded into the poll manager
     Rails.application.eager_load!
 
-    NetSuiteRails::PollManager.sync skip_existing: ENV['SKIP_EXISTING'].present?
+    opts = {
+      skip_existing: ENV['SKIP_EXISTING'].present?
+    }
+
+    if ENV['RECORD_MODELS'].present?
+      opts[:record_models] = ENV['RECORD_MODELS'].split(',').map(&:constantize)
+    end
+
+    if ENV['LIST_MODELS'].present?
+      opts[:list_models] = ENV['LIST_MODELS'].split(',').map(&:constantize)
+    end
+
+    NetSuiteRails::PollManager.sync(opts)
   end
 
 end
