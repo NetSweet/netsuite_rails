@@ -1,11 +1,5 @@
 module NetSuiteRails
   module RecordSync
-    @@netsuite_disable_sync = false
-
-    def self.netsuite_disable_sync(flag = nil)
-      @netsuite_disable_sync = flag unless flag.nil?
-      @netsuite_disable_sync
-    end
 
     def self.included(klass)
       klass.send(:extend, ClassMethods)

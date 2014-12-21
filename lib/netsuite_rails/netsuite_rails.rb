@@ -1,3 +1,4 @@
+require 'netsuite_rails/configuration'
 require 'netsuite_rails/poll_timestamp'
 require 'netsuite_rails/transformations'
 require 'netsuite_rails/poll_manager'

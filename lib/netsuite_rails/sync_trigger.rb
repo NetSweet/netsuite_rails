@@ -45,7 +45,7 @@ module NetSuiteRails
       end
 
       def record_pull_trigger(local)
-        return if RecordSync.netsuite_disable_sync
+        return if NetSuiteRails::Configuration.netsuite_push_disabled
 
         record_trigger_action(local, :netsuite_pull)
       end
@@ -54,7 +54,7 @@ module NetSuiteRails
         # don't update when fields are updated because of a netsuite_pull
         return if netsuite_record_rep.netsuite_pulling?
 
-        return if RecordSync.netsuite_disable_sync
+        return if NetSuiteRails::Configuration.netsuite_push_disabled
 
         # don't update if a read only record
         return if netsuite_record_rep.netsuite_sync == :read
