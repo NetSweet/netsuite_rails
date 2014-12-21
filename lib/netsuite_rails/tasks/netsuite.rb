@@ -26,6 +26,14 @@ namespace :netsuite do
       opts[:list_models] = ENV['LIST_MODELS'].split(',').map(&:constantize)
     end
 
+    # TODO make push disabled configurable
+
+    # field values might change on import because of remote data structure changes
+    # stop all pushes on sync & fresh_sync to avoid pushing up data that really hasn't
+    # changed for each record
+
+    NetSuiteRails::Configuration.netsuite_push_disabled true
+
     NetSuiteRails::PollManager.sync(opts)
   end
 
