@@ -192,12 +192,12 @@ module NetSuiteRails
         # TODO should we just check for nil? vs present?
         # TODO don't need to transform any supported values on :pull yet...
 
-        # if field_hints.has_key?(local_field) && field_value.present?
-        #   case field_hints[local_field]
-        #   when :datetime
-        #     field_value = NetSuite::Ascension::Utilities.normalize_datetime_from_netsuite(field_value)
-        #   end
-        # end
+        if field_hints.has_key?(local_field) && field_value.present?
+          case field_hints[local_field]
+          when :datetime
+            field_value = field_value.change(offset: "-05:00") + 2.hours
+          end
+        end
 
         self.send(:"#{local_field}=", field_value)
       end
