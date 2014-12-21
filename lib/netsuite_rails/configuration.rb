@@ -42,5 +42,13 @@ module NetSuiteRails
       end
     end
 
+    def polling_page_size(size = nil)
+      if size.nil?
+        attributes[:size] ||= 1000
+      else
+        attributes[:size] = size
+      end
+    end
+
   end
 end

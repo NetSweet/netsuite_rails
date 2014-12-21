@@ -7,8 +7,7 @@ module NetSuiteRails
         def poll(klass, opts = {})
           opts = {
             import_all: false,
-            # TODO move to NetSuiteRails.configuration
-            page_size: 1000,
+            page_size: NetSuiteRails::Configuration.polling_page_size,
           }.merge(opts)
 
           opts[:netsuite_record_class] ||= klass.netsuite_record_class
@@ -31,8 +30,6 @@ module NetSuiteRails
         end
 
         def poll_criteria(klass, opts)
-          # saved_search_id: 123
-
           search_criteria = {
             criteria: {
               basic: poll_basic_criteria(klass, opts)
