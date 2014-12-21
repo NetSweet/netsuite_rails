@@ -45,14 +45,13 @@ module NetSuiteRails
             search_criteria[:criteria][:saved] = saved_search_id
           end
 
-
-          # TODO if SS force one of the columns to be an internal ID so we can retrieve the records via getAll
-
-          # columns: [
-          #   'listRel:basic' => [
-          #     'platformCommon:internalId/' => {},
-          #   ],
-          # ],
+          if needs_get_list?(opts)
+            search_criteria[:columns] = {
+              'listRel:basic' => [
+                'platformCommon:internalId/' => {},
+              ],
+            }
+          end
 
           search_criteria
         end
@@ -109,7 +108,7 @@ module NetSuiteRails
             # all of the fields (ex: addressbooklist on customer) that a normal search does
             # the only way to get those fields is to pull down the full record again using getAll
 
-            if (opts[:saved_search_id].present? && opts[:full_record_data] != false) || opts[:full_record_data] == true
+            if needs_get_list?(opts)
               filtered_netsuite_id_list = batch.map(&:internal_id)
 
               if opts[:skip_existing] == true
@@ -138,6 +137,10 @@ module NetSuiteRails
           unless local_record.save
             Rails.logger.error "NetSuite: Error pulling record #{klass} NS ID #{netsuite_record.internal_id} #{local_record.errors.full_messages}"
           end
+        end
+
+        def needs_get_list?(opts)
+          (opts[:saved_search_id].present? && opts[:full_record_data] != false) || opts[:full_record_data] == true
         end
 
       end
