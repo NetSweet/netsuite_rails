@@ -32,14 +32,11 @@ module NetSuiteRails
       # http://alwayscoding.ca/momentos/2013/08/22/handling-dates-and-timezones-in-ruby-and-rails/
 
       def date(date)
-        # netsuite_timezone = ActiveSupport::TimeZone[-8]
-        # netsuite_field_value = Time.use_zone(netsuite_timezone) { Time.zone.local_to_utc(netsuite_field_value) }.in_time_zone(netsuite_timezone) + 2.hour
-
-        date.change(offset: "-07:00", hour: 22)
+        date.change(offset: "-07:00", hour: 24 - (8 + NetSuiteRails::Configuration.netsuite_instance_time_zone_offset))
       end
 
       def datetime(datetime)
-        datetime.change(offset: "-08:00")
+        datetime.change(offset: "-08:00") - (8 + NetSuiteRails::Configuration.netsuite_instance_time_zone_offset).hours
       end
 
     end

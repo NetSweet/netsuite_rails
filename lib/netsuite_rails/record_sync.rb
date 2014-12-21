@@ -195,7 +195,7 @@ module NetSuiteRails
         if field_hints.has_key?(local_field) && field_value.present?
           case field_hints[local_field]
           when :datetime
-            field_value = field_value - (- (Time.zone.utc_offset / 3600) - NetSuiteRails::Configuration.netsuite_instance_time_zone_offset).hours
+            field_value = field_value.change(offset: "00:00") - (Time.zone.utc_offset / 3600).hours + (8 + NetSuiteRails::Configuration.netsuite_instance_time_zone_offset).hours
           end
         end
 
