@@ -4,18 +4,26 @@ module NetSuiteRails
     class << self
 
       def attach(klass)
-        @record_sync ||= []
-        @list_sync ||= []
+        @record_models ||= []
+        @list_models ||= []
 
         if klass.include? RecordSync
-          @record_sync << klass
+          @record_models << klass
         elsif klass.include? ListSync
-          @list_sync << klass
+          @list_models << klass
         end
       end
 
       def sync(opts = {})
-        @record_sync.each do |klass|
+        record_models = opts[:record_models] || @record_models
+        list_models = opts[:list_models] || @list_models
+
+        list_models.each do |klass|
+          Rails.logger.info "NetSuite: Syncing #{klass}"
+          klass.netsuite_poll
+        end
+
+        record_models.each do |klass|
           sync_frequency = klass.netsuite_sync_options[:frequency] || 1.day
 
           if sync_frequency == :never
@@ -46,12 +54,8 @@ module NetSuiteRails
           preference.value = DateTime.now
           preference.save!
         end
-
-        @list_sync.each do |klass|
-          Rails.logger.info "NetSuite: Syncing #{klass}"
-          klass.netsuite_poll
-        end
       end
+      
     end
 
   end
