@@ -1,8 +1,10 @@
+[![Build Status](https://travis-ci.org/NetSweet/netsuite_rails.svg?branch=master)](https://travis-ci.org/NetSweet/netsuite_rails)
+
 # NetSuite Rails
 
 **Note:** Documentation is horrible... look at the code for details.
 
-Build custom rails application that sync to NetSuite.
+Build custom Ruby on Rails applications that sync to NetSuite.
 
 ## Installation
 
@@ -19,9 +21,8 @@ rails g netsuite_rails:install
 ### Date & Time
 
 ```ruby
-NetSuiteRails.configure do
-	
-end
+# set your timezone offset
+NetSuiteRails::Configuration.netsuite_instance_time_zone_offset(-6)
 ```
 
 ## Usage
@@ -32,6 +33,10 @@ When using a proc in a NS mapping, you are responsible for setting local and rem
 
 for pushing tasks to DJ https://github.com/collectiveidea/delayed_job/wiki/Rake-Task-as-a-Delayed-Job
 
+`:if` for controlling when syncing occurs
+
+TODO hooks for before/after push/pull
+
 ### Syncing
 
 ```bash
@@ -39,6 +44,11 @@ rake netsuite:sync
 
 rake netsuite:fresh_sync
 ```
+
+Caveats:
+
+* If you have date time fields, or custom fields that will trigger `changed_attributes` this might cause issues when pulling an existing record
+* `changed_attributes` doesn't work well with store
 
 ## Testing
 
