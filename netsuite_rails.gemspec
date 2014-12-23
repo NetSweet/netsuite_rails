@@ -7,8 +7,8 @@ Gem::Specification.new do |s|
   s.version       = "0.1.0"
   s.authors       = ["Michael Bianco"]
   s.email         = ["mike@cliffsidemedia.com"]
-  s.summary       = %q{Write Rails applications that sync with NetSuite}
-  s.homepage      = ""
+  s.summary       = %q{Write Rails applications that integrate with NetSuite}
+  s.homepage      = "http://github.com/netsweet/netsuite_rails"
   s.license       = "MIT"
 
   s.files         = `git ls-files -z`.split("\x0")
@@ -21,5 +21,5 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency "bundler", "~> 1.6"
   s.add_development_dependency "rake"
-  s.add_development_dependency "rspec"
+  s.add_development_dependency "rspec", '~> 3.1'
 end
