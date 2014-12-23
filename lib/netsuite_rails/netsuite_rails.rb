@@ -1,17 +1,26 @@
+require 'netsuite'
+
 require 'netsuite_rails/configuration'
 require 'netsuite_rails/poll_timestamp'
 require 'netsuite_rails/transformations'
+require 'netsuite_rails/url_helper'
+
 require 'netsuite_rails/poll_manager'
 require 'netsuite_rails/sync_trigger'
 require 'netsuite_rails/sub_list_sync'
+
 require 'netsuite_rails/record_sync'
 require 'netsuite_rails/record_sync/pull_manager'
 require 'netsuite_rails/record_sync/push_manager'
+
 require 'netsuite_rails/list_sync'
 require 'netsuite_rails/list_sync/pull_manager'
-require 'netsuite_rails/url_helper'
 
 module NetSuiteRails
+
+  def self.rails4?
+    Rails::VERSION::MAJOR >= 4
+  end
 
   class Railtie < ::Rails::Railtie
     rake_tasks do
