@@ -184,8 +184,15 @@ module NetSuiteRails
             h
           end
 
+          changed_attributes_keys = local_record.changed_attributes.keys
+
+          # TODO documentation about serialized values
+          changed_attributes_keys += local_record.serialized_attributes.keys.map do |k|
+            local_record.send(k.to_sym).keys.map(&:to_s)
+          end.flatten
+
           # convert relationship symbols from :object_id to :object
-          local_record.changed_attributes.keys.map do |k|
+          changed_attributes_keys.map do |k|
             association_field_key_mapping[k.to_sym] || k.to_sym
           end
         end
