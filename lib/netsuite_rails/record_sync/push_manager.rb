@@ -96,6 +96,12 @@ module NetSuiteRails
           custom_field_list = local_record.netsuite_field_map[:custom_field_list] || {}
           field_hints = local_record.netsuite_field_hints
 
+          reflections = if NetSuiteRails.rails4?
+            local_record.class.reflections
+          else
+            local_record.reflections
+          end
+
           all_field_list.each do |local_field, netsuite_field|
             # allow Procs as field mapping in the record definition for custom mapping
             if netsuite_field.is_a?(Proc)
@@ -167,7 +173,13 @@ module NetSuiteRails
 
           # TODO think about has_many / join table changes
 
-          association_field_key_mapping = local_record.reflections.values.reject(&:collection?).inject({}) do |h, a|
+          reflections = if NetSuiteRails.rails4?
+            local_record.class.reflections
+          else
+            local_record.reflections
+          end
+
+          association_field_key_mapping = reflections.values.reject(&:collection?).inject({}) do |h, a|
             h[a.association_foreign_key.to_sym] = a.name
             h
           end
