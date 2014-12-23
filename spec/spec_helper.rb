@@ -1,6 +1,9 @@
 require 'rails/all'
+
 require 'shoulda/matchers'
 require 'rspec/rails'
+require 'faker'
+require 'pry'
 
 require 'netsuite_rails'
 
@@ -9,6 +12,8 @@ Dir[File.join(File.dirname(__FILE__), "support/**/*.rb")].each {|f| require f }
 TestApplication::Application.initialize!
 
 RSpec.configure do |config|
+  config.color = true
+
   config.expect_with :rspec do |expectations|
     expectations.include_chain_clauses_in_custom_matcher_descriptions = true
   end
