@@ -177,21 +177,14 @@ module NetSuiteRails
         if association_keys.include?(local_field)
           field_value = self.reflections[local_field].klass.where(netsuite_id: field_value.internal_id).first_or_initialize
         elsif is_custom_field
-          # TODO I believe this only handles a subset of all the possibly CustomField values
-          if field_value.present? && field_value.is_a?(Hash) && field_value.has_key?(:name)
-            field_value = field_value[:name]
-          end
-
-          if field_value.present? && field_value.is_a?(NetSuite::Records::CustomRecordRef)
-            field_value = field_value.attributes[:name]
-          end
+          field_value = NetSuiteRails::RecordSync::PullManager.extract_custom_field_value(field_value)
         else
           # then it's not a custom field
         end
 
         # TODO should we just check for nil? vs present?
-        # TODO don't need to transform any supported values on :pull yet...
 
+        # TODO should be moved to Transformations with a direction flag
         if field_hints.has_key?(local_field) && field_value.present?
           case field_hints[local_field]
           when :datetime
@@ -210,6 +203,7 @@ module NetSuiteRails
       # return netsuite record for debugging
       netsuite_record
     end
+
 
     def new_netsuite_record?
       self.netsuite_id.blank?

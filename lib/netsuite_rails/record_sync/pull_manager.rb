@@ -1,6 +1,8 @@
 module NetSuiteRails
   module RecordSync
 
+    # TODO move to search manager
+
     class PullManager
       class << self
 
@@ -138,6 +140,20 @@ module NetSuiteRails
 
         def needs_get_list?(opts)
           (opts[:saved_search_id].present? && opts[:full_record_data] != false) || opts[:full_record_data] == true
+        end
+
+        # TODO this should remain in the pull manager
+
+        def extract_custom_field_value(custom_field_value)
+          if custom_field_value.present? && custom_field_value.is_a?(Hash) && custom_field_value.has_key?(:name)
+            custom_field_value = custom_field_value[:name]
+          end
+
+          if custom_field_value.present? && custom_field_value.is_a?(NetSuite::Records::CustomRecordRef)
+            custom_field_value = custom_field_value.attributes[:name]
+          end
+
+          custom_field_value
         end
 
       end
