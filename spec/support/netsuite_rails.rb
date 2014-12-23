@@ -1,0 +1,1 @@
+NetSuiteRails::Configuration.netsuite_sync_mode(:sync)
