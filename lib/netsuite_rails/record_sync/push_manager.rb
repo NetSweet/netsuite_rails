@@ -180,7 +180,13 @@ module NetSuiteRails
           end
 
           association_field_key_mapping = reflections.values.reject(&:collection?).inject({}) do |h, a|
-            h[a.association_foreign_key.to_sym] = a.name
+            begin
+              h[a.association_foreign_key.to_sym] = a.name
+            rescue Exception => e
+              # occurs when `has_one through:` exists on a record but `through` is not a valid reference
+              Rails.logger.error "NetSuite: error detecting foreign key #{a.name}"
+            end
+
             h
           end
 
