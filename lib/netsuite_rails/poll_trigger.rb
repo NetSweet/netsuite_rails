@@ -1,5 +1,5 @@
 module NetSuiteRails
-  class PollManager
+  class PollTrigger
 
     class << self
 

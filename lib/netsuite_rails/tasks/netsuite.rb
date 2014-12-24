@@ -34,7 +34,7 @@ namespace :netsuite do
 
     NetSuiteRails::Configuration.netsuite_push_disabled true
 
-    NetSuiteRails::PollManager.sync(opts)
+    NetSuiteRails::PollTrigger.sync(opts)
   end
 
 end

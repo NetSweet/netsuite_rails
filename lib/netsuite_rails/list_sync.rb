@@ -4,7 +4,7 @@ module NetSuiteRails
     def self.included(klass)
       klass.send(:extend, ClassMethods)
 
-      PollManager.attach(klass)
+      PollTrigger.attach(klass)
     end
 
     module ClassMethods
@@ -17,7 +17,7 @@ module NetSuiteRails
       end
 
       def netsuite_poll(opts = {})
-        NetSuiteRails::ListSync::PullManager.poll(self, opts)
+        NetSuiteRails::ListSync::PollManager.poll(self, opts)
       end
     end
 

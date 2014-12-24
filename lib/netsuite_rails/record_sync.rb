@@ -5,12 +5,12 @@ module NetSuiteRails
       klass.send(:extend, ClassMethods)
 
       SyncTrigger.attach(klass)
-      PollManager.attach(klass)
+      PollTrigger.attach(klass)
     end
 
     module ClassMethods
       def netsuite_poll(opts = {})
-        RecordSync::PullManager.poll(self, opts)
+        RecordSync::PollManager.poll(self, opts)
       end
 
       attr_accessor :netsuite_custom_record_type_id
