@@ -10,7 +10,7 @@ module NetSuiteRails::TestHelpers
     if stamp.nil?
       @netsuite_timestamp ||= (Time.now - (60 * 2)).to_datetime
     else
-      @netsuite_timestamp ||= stamp
+      @netsuite_timestamp = stamp
     end
   end
 
@@ -53,4 +53,8 @@ module NetSuiteRails::TestHelpers
     end
   end
 
+end
+
+RSpec.configure do |config|
+  config.include NetSuiteRails::TestHelpers, type: :feature
 end
