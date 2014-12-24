@@ -3,6 +3,7 @@ module NetSuiteRails
 
     def self.included(klass)
       klass.send(:extend, ClassMethods)
+      klass.send(:include, InstanceMethods)
 
       SyncTrigger.attach(klass)
       PollTrigger.attach(klass)
@@ -44,8 +45,6 @@ module NetSuiteRails
         else
           @netsuite_field_map = field_mapping
         end
-
-        @netsuite_field_map
       end
 
       def netsuite_local_fields
@@ -75,154 +74,154 @@ module NetSuiteRails
         self.netsuite_record_class == NetSuite::Records::CustomRecord
       end
 
-      # :read_only, :aggressive (push & update on save), :write_only, :read_write
+      # :read, :aggressive (push & update on save), :write_only, :read_write
       def netsuite_sync(flag = nil, opts = {})
         if flag.nil?
           @netsuite_sync_options ||= {}
-          @netsuite_sync ||= :read_only
+          @netsuite_sync ||= :read
         else
-          @netsuite_sync = flag
           @netsuite_sync_options = opts
+          @netsuite_sync = flag
         end
       end
     end
 
-    attr_accessor :netsuite_manual_fields
+    module InstanceMethods
+      attr_accessor :netsuite_manual_fields
 
-    # these methods are here for easy model override
+      # these methods are here for easy model override
 
-    def netsuite_sync_options
-      self.class.netsuite_sync_options
-    end
-
-    def netsuite_sync
-      self.class.netsuite_sync
-    end
-
-    def netsuite_record_class
-      self.class.netsuite_record_class
-    end
-
-    def netsuite_field_map
-      self.class.netsuite_field_map
-    end
-
-    def netsuite_field_hints
-      self.class.netsuite_field_hints
-    end
-
-    # assumes netsuite_id field on activerecord
-
-    def netsuite_pulling?
-      @netsuite_pulling ||= false
-    end
-
-    def netsuite_pulled?
-      @netsuite_pulled ||= false
-    end
-
-    def netsuite_pull
-      netsuite_extract_from_record(netsuite_pull_record)
-    end
-
-    def netsuite_pull_record
-      if netsuite_custom_record?
-        NetSuite::Records::CustomRecord.get(
-          internal_id: self.netsuite_id,
-          type_id: self.class.netsuite_custom_record_type_id
-        )
-      else
-        self.netsuite_record_class.get(self.netsuite_id)
+      def netsuite_sync_options
+        self.class.netsuite_sync_options
       end
-    end
 
-    def netsuite_push(opts = {})
-      NetSuiteRails::RecordSync::PushManager.push(self, opts)
-    end
+      def netsuite_sync
+        self.class.netsuite_sync
+      end
 
-    def netsuite_extract_from_record(netsuite_record)
-      @netsuite_pulling = true
+      def netsuite_record_class
+        self.class.netsuite_record_class
+      end
 
-      field_hints = self.netsuite_field_hints
+      def netsuite_field_map
+        self.class.netsuite_field_map
+      end
 
-      custom_field_list = self.netsuite_field_map[:custom_field_list] || {}
+      def netsuite_field_hints
+        self.class.netsuite_field_hints
+      end
 
-      all_field_list = self.netsuite_field_map.except(:custom_field_list) || {}
-      all_field_list.merge!(custom_field_list)
+      # assumes netsuite_id field on activerecord
 
-      # self.netsuite_normalize_datetimes(:pull)
+      def netsuite_pulling?
+        @netsuite_pulling ||= false
+      end
 
-      # handle non-collection associations
-      association_keys = self.reflections.values.reject(&:collection?).map(&:name)
+      def netsuite_pulled?
+        @netsuite_pulled ||= false
+      end
 
-      all_field_list.each do |local_field, netsuite_field|
-        is_custom_field = custom_field_list.keys.include?(local_field)
+      def netsuite_pull
+        netsuite_extract_from_record(netsuite_pull_record)
+      end
 
-        if netsuite_field.is_a?(Proc)
-          netsuite_field.call(self, netsuite_record, :pull)
-          next
-        end
-
-        field_value = if is_custom_field
-          netsuite_record.custom_field_list.send(netsuite_field).value rescue ""
+      def netsuite_pull_record
+        if netsuite_custom_record?
+          NetSuite::Records::CustomRecord.get(
+            internal_id: self.netsuite_id,
+            type_id: self.class.netsuite_custom_record_type_id
+          )
         else
-          netsuite_record.send(netsuite_field)
+          self.netsuite_record_class.get(self.netsuite_id)
+        end
+      end
+
+      def netsuite_push(opts = {})
+        NetSuiteRails::RecordSync::PushManager.push(self, opts)
+      end
+
+      def netsuite_extract_from_record(netsuite_record)
+        @netsuite_pulling = true
+
+        field_hints = self.netsuite_field_hints
+
+        custom_field_list = self.netsuite_field_map[:custom_field_list] || {}
+
+        all_field_list = self.netsuite_field_map.except(:custom_field_list) || {}
+        all_field_list.merge!(custom_field_list)
+
+        # self.netsuite_normalize_datetimes(:pull)
+
+        # handle non-collection associations
+        association_keys = self.reflections.values.reject(&:collection?).map(&:name)
+
+        all_field_list.each do |local_field, netsuite_field|
+          is_custom_field = custom_field_list.keys.include?(local_field)
+
+          if netsuite_field.is_a?(Proc)
+            netsuite_field.call(self, netsuite_record, :pull)
+            next
+          end
+
+          field_value = if is_custom_field
+            netsuite_record.custom_field_list.send(netsuite_field).value rescue ""
+          else
+            netsuite_record.send(netsuite_field)
+          end
+
+          if field_value.blank?
+            # TODO possibly nil out the local value?
+            next
+          end
+
+          if association_keys.include?(local_field)
+            field_value = self.reflections[local_field].klass.where(netsuite_id: field_value.internal_id).first_or_initialize
+          elsif is_custom_field
+            field_value = NetSuiteRails::RecordSync::PullManager.extract_custom_field_value(field_value)
+          else
+            # then it's not a custom field
+          end
+
+          # TODO should we just check for nil? vs present?
+
+          # TODO should be moved to Transformations with a direction flag
+          if field_hints.has_key?(local_field) && field_value.present?
+            case field_hints[local_field]
+            when :datetime
+              field_value = field_value.change(offset: "00:00") - (Time.zone.utc_offset / 3600).hours + (8 + NetSuiteRails::Configuration.netsuite_instance_time_zone_offset).hours
+            end
+          end
+
+          self.send(:"#{local_field}=", field_value)
         end
 
-        if field_value.blank?
-          # TODO possibly nil out the local value?
-          next
-        end
+        netsuite_execute_callbacks(self.class.after_netsuite_pull, netsuite_record)
 
-        if association_keys.include?(local_field)
-          field_value = self.reflections[local_field].klass.where(netsuite_id: field_value.internal_id).first_or_initialize
-        elsif is_custom_field
-          field_value = NetSuiteRails::RecordSync::PullManager.extract_custom_field_value(field_value)
-        else
-          # then it's not a custom field
-        end
+        @netsuite_pulling = false
+        @netsuite_pulled = true
+      end
 
-        # TODO should we just check for nil? vs present?
 
-        # TODO should be moved to Transformations with a direction flag
-        if field_hints.has_key?(local_field) && field_value.present?
-          case field_hints[local_field]
-          when :datetime
-            field_value = field_value.change(offset: "00:00") - (Time.zone.utc_offset / 3600).hours + (8 + NetSuiteRails::Configuration.netsuite_instance_time_zone_offset).hours
+      def new_netsuite_record?
+        self.netsuite_id.blank?
+      end
+
+      def netsuite_custom_record?
+        self.netsuite_record_class == NetSuite::Records::CustomRecord
+      end
+
+      # TODO this should be protected; it needs to be pushed down to the Push/Pull manager level
+
+      def netsuite_execute_callbacks(list, record)
+        list.each do |callback|
+          if callback.is_a?(Symbol)
+            self.send(callback, record)
+          else
+            instance_exec(record, &callback)
           end
         end
-
-        self.send(:"#{local_field}=", field_value)
       end
 
-      netsuite_execute_callbacks(self.class.after_netsuite_pull, netsuite_record)
-
-      @netsuite_pulling = false
-      @netsuite_pulled = true
-
-      # return netsuite record for debugging
-      netsuite_record
-    end
-
-
-    def new_netsuite_record?
-      self.netsuite_id.blank?
-    end
-
-    def netsuite_custom_record?
-      self.netsuite_record_class == NetSuite::Records::CustomRecord
-    end
-
-    # TODO this should be protected; it needs to be pushed down to the Push/Pull manager level
-
-    def netsuite_execute_callbacks(list, record)
-      list.each do |callback|
-        if callback.is_a?(Symbol)
-          self.send(callback, record)
-        else
-          instance_exec(record, &callback)
-        end
-      end
     end
 
   end
