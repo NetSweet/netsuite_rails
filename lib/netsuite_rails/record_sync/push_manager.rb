@@ -40,7 +40,7 @@ module NetSuiteRails
           end
         end
 
-        def push_update(local_record, netsuite_record)
+        def push_update(local_record, netsuite_record, opts = {})
           # build change hash to limit the number of fields pushed to NS on change
           # NS could have logic which could change field functionality depending on
           # input data; it's safest to limit the number of field changes pushed to NS
