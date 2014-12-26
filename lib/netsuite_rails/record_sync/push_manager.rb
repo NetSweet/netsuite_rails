@@ -8,7 +8,11 @@ module NetSuiteRails
           # TODO check to see if anything is changed before moving forward
           # if changes_keys.blank? && local_record.netsuite_manual_fields
 
-          netsuite_record = build_netsuite_record(local_record)
+          unless opts[:modified_fields]
+            opts[:modified_fields] = modified_local_fields(local_record)
+          end
+
+          netsuite_record = build_netsuite_record(local_record, opts)
 
           local_record.netsuite_execute_callbacks(local_record.class.before_netsuite_push, netsuite_record)
 
@@ -46,11 +50,11 @@ module NetSuiteRails
           # input data; it's safest to limit the number of field changes pushed to NS
 
           custom_field_list = local_record.netsuite_field_map[:custom_field_list] || {}
-          all_field_list = eligible_local_fields(local_record)
+          modified_fields_list = opts[:modified_fields] || modified_local_fields(local_record)
 
           update_list = {}
 
-          all_field_list.each do |local_field, netsuite_field|
+          modified_fields_list.each do |local_field, netsuite_field|
             if custom_field_list.keys.include?(local_field)
               # if custom field has changed, mark and copy over customFieldList later
               update_list[:custom_field_list] = true
@@ -92,7 +96,7 @@ module NetSuiteRails
 
           # TODO need to normalize datetime fields
 
-          all_field_list = eligible_local_fields(local_record)
+          all_field_list = opts[:modified_fields] || modified_local_fields(local_record)
           custom_field_list = local_record.netsuite_field_map[:custom_field_list] || {}
           field_hints = local_record.netsuite_field_hints
 
@@ -151,20 +155,20 @@ module NetSuiteRails
           netsuite_record
         end
 
-        def eligible_local_fields(local_record)
-          custom_field_list = local_record.netsuite_field_map[:custom_field_list] || {}
-          all_field_list = local_record.netsuite_field_map.except(:custom_field_list) || {}
+        def modified_local_fields(local_record)
+          custom_netsuite_field_list = local_record.netsuite_field_map[:custom_field_list] || {}
+          standard_netsuite_field_list = local_record.netsuite_field_map.except(:custom_field_list) || {}
 
-          all_field_list.merge!(custom_field_list)
+          synced_netsuite_fields = custom_netsuite_field_list.merge(standard_netsuite_field_list)
 
           changed_keys = changed_attributes(local_record)
 
           # filter out unchanged keys when updating record
           unless local_record.new_netsuite_record?
-            all_field_list.select! { |k,v| changed_keys.include?(k) }
+            synced_netsuite_fields.select! { |k,v| changed_keys.include?(k) }
           end
 
-          all_field_list
+          synced_netsuite_fields
         end
 
         def changed_attributes(local_record)
