@@ -1,2 +1,5 @@
+db/
+tmp/
+.bundle/
 Gemfile.lock
 vendor/
