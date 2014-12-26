@@ -2,6 +2,24 @@ module NetSuiteRails
   module RecordSync
 
     def self.included(klass)
+      klass.class_eval do
+        class_attribute :netsuite_settings
+
+        self.netsuite_settings = {
+          before_netsuite_push: [],
+          after_netsuite_push: [],
+          after_netsuite_pull: [],
+
+          netsuite_sync: :read,
+          netsuite_field_map: {},
+          netsuite_field_hints: {},
+          netsuite_record_class: nil,
+        }
+
+        cattr_accessor :netsuite_custom_record_type_id
+        cattr_accessor :netsuite_sync_options
+      end
+
       klass.send(:extend, ClassMethods)
       klass.send(:include, InstanceMethods)
 
@@ -16,57 +34,53 @@ module NetSuiteRails
 
       attr_accessor :netsuite_custom_record_type_id
       attr_accessor :netsuite_sync_options
-      attr_accessor :netsuite_credentials
 
       # TODO is there a better way to implement callback chains?
       #      https://github.com/rails/rails/blob/0c0f278ab20f3042cdb69604166e18a61f8605ad/activesupport/lib/active_support/callbacks.rb#L491
 
       def before_netsuite_push(callback = nil, &block)
-        @before_netsuite_push ||= []
-        @before_netsuite_push << (callback || block) if callback || block
-        @before_netsuite_push
+        self.netsuite_settings[:before_netsuite_push] << (callback || block) if callback || block
+        self.netsuite_settings[:before_netsuite_push]
       end
 
       def after_netsuite_push(callback = nil, &block)
-        @after_netsuite_push ||= []
-        @after_netsuite_push << (callback || block) if callback || block
-        @after_netsuite_push
+        self.netsuite_settings[:after_netsuite_push] << (callback || block) if callback || block
+        self.netsuite_settings[:after_netsuite_push]
       end
 
       def after_netsuite_pull(callback = nil, &block)
-        @after_netsuite_pull ||= []
-        @after_netsuite_pull << (callback || block) if callback || block
-        @after_netsuite_pull
+        self.netsuite_settings[:after_netsuite_pull] << (callback || block) if callback || block
+        self.netsuite_settings[:after_netsuite_pull]
       end
 
       def netsuite_field_map(field_mapping = nil)
-        if field_mapping.nil?
-          @netsuite_field_map ||= {}
-        else
-          @netsuite_field_map = field_mapping
+        if !field_mapping.nil?
+          self.netsuite_settings[:netsuite_field_map] = field_mapping
         end
+
+        self.netsuite_settings[:netsuite_field_map]
       end
 
-      def netsuite_local_fields
-        @netsuite_field_map.except(:custom_field_list).keys + (@netsuite_field_map[:custom_field_list] || {}).keys
-      end
+      # def netsuite_local_fields
+      #   @netsuite_field_map.except(:custom_field_list).keys + (@netsuite_field_map[:custom_field_list] || {}).keys
+      # end
 
       def netsuite_field_hints(list = nil)
-        if list.nil?
-          @netsuite_field_hints ||= {}
-        else
-          @netsuite_field_hints = list
+        if !list.nil?
+          self.netsuite_settings[:netsuite_field_hints] = list
         end
+
+        self.netsuite_settings[:netsuite_field_hints]
       end
 
       # TODO persist type for CustomRecordRef
       def netsuite_record_class(record_class = nil, custom_record_type_id = nil)
-        if record_class.nil?
-          @netsuite_record_class
-        else
-          @netsuite_record_class = record_class
-          @netsuite_custom_record_type_id = custom_record_type_id
+        if !record_class.nil?
+          self.netsuite_settings[:netsuite_record_class] = record_class
+          self.netsuite_custom_record_type_id = custom_record_type_id
         end
+
+        self.netsuite_settings[:netsuite_record_class]
       end
 
       # there is a model level of this method in order to be based on the model level record class
@@ -76,13 +90,12 @@ module NetSuiteRails
 
       # :read, :aggressive (push & update on save), :write_only, :read_write
       def netsuite_sync(flag = nil, opts = {})
-        if flag.nil?
-          @netsuite_sync_options ||= {}
-          @netsuite_sync ||= :read
-        else
-          @netsuite_sync_options = opts
-          @netsuite_sync = flag
+        if !flag.nil?
+          self.netsuite_sync_options = opts
+          self.netsuite_settings[:netsuite_sync] = flag
         end
+
+        self.netsuite_settings[:netsuite_sync]
       end
     end
 
