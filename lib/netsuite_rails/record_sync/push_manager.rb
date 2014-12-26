@@ -4,7 +4,7 @@ module NetSuiteRails
     class PushManager
       class << self
 
-        def push(local_record, opts)
+        def push(local_record, opts = {})
           # TODO check to see if anything is changed before moving forward
           # if changes_keys.blank? && local_record.netsuite_manual_fields
 
@@ -13,9 +13,9 @@ module NetSuiteRails
           local_record.netsuite_execute_callbacks(local_record.class.before_netsuite_push, netsuite_record)
 
           if !local_record.new_netsuite_record?
-            push_update(local_record, netsuite_record)
+            push_update(local_record, netsuite_record, opts)
           else
-            push_add(local_record, netsuite_record)
+            push_add(local_record, netsuite_record, opts)
           end
 
           # :aggressive is for custom fields which are based on input – need pull updated values after
@@ -30,7 +30,7 @@ module NetSuiteRails
           true
         end
 
-        def push_add(local_record, netsuite_record)
+        def push_add(local_record, netsuite_record, opts = {})
           if netsuite_record.add
             # update_column to avoid triggering another save
             local_record.update_column(:netsuite_id, netsuite_record.internal_id)
@@ -87,7 +87,7 @@ module NetSuiteRails
           end
         end
 
-        def build_netsuite_record(local_record)
+        def build_netsuite_record(local_record, opts = {})
           netsuite_record = build_netsuite_record_reference(local_record)
 
           # TODO need to normalize datetime fields
