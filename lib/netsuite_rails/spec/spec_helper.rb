@@ -15,10 +15,20 @@ module NetSuiteRails::TestHelpers
   end
 
   def get_last_netsuite_object(record)
-    search = record.netsuite_record_class.search({
+    # TODO support passing custom record ref
+
+    if netsuite_record_class.class.to_s.start_with?('NetSuite::Records')
+      record_class = record
+      is_custom_record = false
+    else
+      record_class = record.netsuite_record_class
+      is_custom_record = record.netsuite_custom_record?
+    end
+
+    search = record_class.search({
       criteria: {
         basic:
-        if record.netsuite_custom_record?
+        if is_custom_record
           [
             {
               field: 'recType',
@@ -31,6 +41,20 @@ module NetSuiteRails::TestHelpers
               value: netsuite_timestamp
             }
           ]
+
+          +
+
+          if record_class == NetSuite::Records::SalesOrder
+            [
+              {
+                field: 'type',
+                operator: 'anyOf',
+                value: [ '_salesOrder' ]
+              }
+            ]
+          else
+            []
+          end
         else
           [
             {
@@ -43,13 +67,13 @@ module NetSuiteRails::TestHelpers
       }
     })
 
-    if record.netsuite_custom_record?
+    if is_custom_record
       NetSuite::Records::CustomRecord.get(
         internal_id: search.results.first.internal_id.to_i,
         type_id: record.class.netsuite_custom_record_type_id
       )
     else
-      record.netsuite_record_class.get(search.results.first.internal_id.to_i)
+      record_class.get(search.results.first.internal_id.to_i)
     end
   end
 
