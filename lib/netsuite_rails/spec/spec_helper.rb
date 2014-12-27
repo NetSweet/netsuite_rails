@@ -17,7 +17,7 @@ module NetSuiteRails::TestHelpers
   def get_last_netsuite_object(record)
     # TODO support passing custom record ref
 
-    if netsuite_record_class.class.to_s.start_with?('NetSuite::Records')
+    if record.is_a?(Class)
       record_class = record
       is_custom_record = false
     else

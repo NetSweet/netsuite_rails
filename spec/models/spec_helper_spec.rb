@@ -4,9 +4,9 @@ require 'netsuite_rails/spec/spec_helper'
 
 describe NetSuiteRails::TestHelpers do
   include NetSuiteRails::TestHelpers
-  
+
   it "should accept a standard NS gem object" do
-    allow(NetSuite::Records::Customer).to receive(:search)
+    allow(NetSuite::Records::Customer).to receive(:search).and_return(OpenStruct.new(results: [ OpenStruct.new(internal_id: 0) ]))
     allow(NetSuite::Records::Customer).to receive(:get)
 
     get_last_netsuite_object(NetSuite::Records::Customer)
