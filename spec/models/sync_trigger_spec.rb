@@ -1,21 +1,11 @@
 require 'spec_helper'
 
 describe NetSuiteRails::SyncTrigger do
-
+  include ExampleModels
+  
   before do
-    define_model :standard_record, phone: :string, netsuite_id: :integer do
-      include NetSuiteRails::RecordSync
-
-      netsuite_record_class NetSuite::Records::Customer
-      netsuite_sync :read_write
-      netsuite_field_map({
-        :phone => :phone
-      })
-    end
-
     allow(NetSuiteRails::RecordSync::PushManager).to receive(:push_add)
     allow(NetSuiteRails::RecordSync::PushManager).to receive(:push_update)
-
   end
 
   it "should push new record when saved" do
