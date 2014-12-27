@@ -10,7 +10,7 @@ group :test do
 
   gem 'faker'
   gem 'shoulda-matchers'
-  gem 'rails', '~> 4.2.0'
+  gem 'rails', '3.2.16'
   gem 'sqlite3', :platform => :ruby
 
   gem 'rspec-rails', '~> 3.1'
