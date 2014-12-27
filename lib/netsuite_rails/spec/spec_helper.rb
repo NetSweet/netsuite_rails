@@ -28,6 +28,7 @@ module NetSuiteRails::TestHelpers
     search = record_class.search({
       criteria: {
         basic:
+        (
         if is_custom_record
           [
             {
@@ -41,20 +42,6 @@ module NetSuiteRails::TestHelpers
               value: netsuite_timestamp
             }
           ]
-
-          +
-
-          if record_class == NetSuite::Records::SalesOrder
-            [
-              {
-                field: 'type',
-                operator: 'anyOf',
-                value: [ '_salesOrder' ]
-              }
-            ]
-          else
-            []
-          end
         else
           [
             {
@@ -63,7 +50,20 @@ module NetSuiteRails::TestHelpers
               value: netsuite_timestamp
             }
           ]
+        end + 
+
+        if record_class == NetSuite::Records::SalesOrder
+          [
+            {
+              field: 'type',
+              operator: 'anyOf',
+              value: [ '_salesOrder' ]
+            }
+          ]
+        else
+          []
         end
+        )
       }
     })
 
