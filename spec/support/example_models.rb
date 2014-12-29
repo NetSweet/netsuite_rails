@@ -14,6 +14,11 @@ module ExampleModels
           })
         end
 
+        define_model :standard_list, netsuite_id: :integer, value: :string do
+          include NetSuiteRails::ListSync
+          netsuite_list_id 86
+        end
+
       end
     end
   end
