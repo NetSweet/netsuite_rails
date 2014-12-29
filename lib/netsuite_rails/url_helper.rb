@@ -6,13 +6,22 @@ module NetSuiteRails
     def self.netsuite_url(record = self)
       prefix = "https://system#{".sandbox" if NetSuite::Configuration.sandbox}.netsuite.com/app"
 
-      record_class = record.netsuite_record_class
-      internal_id = record.netsuite_id
+      if record.class.to_s.start_with?('NetSuite::Records')
+        record_class = record.class
+        internal_id = record.internal_id
+        is_custom_record = false
+      else
+        record_class = record.netsuite_record_class
+        internal_id = record.netsuite_id
+        is_custom_record = record.netsuite_custom_record?
+      end
+
+      # TODO support NS classes, should jump right to the list for the class
 
       # https://system.sandbox.netsuite.com/app/common/scripting/scriptrecordlist.nl
       # https://system.sandbox.netsuite.com/app/common/scripting/script.nl
 
-      if record.netsuite_custom_record?
+      if is_custom_record
         "#{prefix}/common/custom/custrecordentry.nl?id=#{internal_id}&rectype=#{record.class.netsuite_custom_record_type_id}"
       elsif [ NetSuite::Records::InventoryItem, NetSuite::Records::NonInventorySaleItem, NetSuite::Records::AssemblyItem].include?(record_class)
         "#{prefix}/common/item/item.nl?id=#{internal_id}"
