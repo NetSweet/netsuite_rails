@@ -6,7 +6,7 @@ module NetSuiteRails
       def poll(klass, opts = {})
         custom_list = NetSuite::Records::CustomList.get(klass.netsuite_list_id)
 
-        process_results(custom_list.custom_value_list.custom_value)
+        process_results(klass, opts, custom_list.custom_value_list.custom_value)
       end
 
       def process_results(klass, opts, list)
