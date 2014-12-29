@@ -10,6 +10,7 @@ module NetSuiteRails
         }.merge(opts)
 
         opts[:netsuite_record_class] ||= klass.netsuite_record_class
+        opts[:saved_search_id] ||= klass.netsuite_sync_options[:saved_search_id]
 
         search = opts[:netsuite_record_class].search(
           poll_criteria(klass, opts).merge({
@@ -35,10 +36,8 @@ module NetSuiteRails
           }
         }
 
-        saved_search_id = opts[:saved_search_id] || klass.netsuite_sync_options[:saved_search_id]
-
-        if saved_search_id
-          search_criteria[:criteria][:saved] = saved_search_id
+        if opts[:saved_search_id]
+          search_criteria[:criteria][:saved] = opts[:saved_search_id]
         end
 
         if needs_get_list?(opts)
@@ -105,13 +104,17 @@ module NetSuiteRails
           # the only way to get those fields is to pull down the full record again using getAll
 
           if needs_get_list?(opts)
-            filtered_netsuite_id_list = batch.map(&:internal_id)
+            filtered_netsuite_id_list = batch.map(&:internal_id).map(&:to_i)
 
             if opts[:skip_existing] == true
               filtered_netsuite_id_list.reject! { |netsuite_id| synced_netsuite_list.include?(netsuite_id) }
             end
 
-            opts[:netsuite_record_class].get_list(list: batch.map(&:internal_id))
+            if filtered_netsuite_id_list.present?
+              opts[:netsuite_record_class].get_list(list: filtered_netsuite_id_list)
+            else
+              []
+            end
           else
             batch
           end.each do |netsuite_record|
