@@ -15,6 +15,12 @@ describe NetSuiteRails::RecordSync::PollManager do
   	expect(NetSuite::Records::Customer).to have_received(:search)
   end
 
+  pending "should poll and then get_list on saved search" do
+    # TODO SS enabled record
+    # TODO mock search to return one result
+    # TODO mock out get_list
+  end
+
   it "should poll list sync objects" do
   	allow(NetSuite::Records::CustomList).to receive(:get).and_return(OpenStruct.new(custom_value_list: OpenStruct.new(custom_value: [])))
 
