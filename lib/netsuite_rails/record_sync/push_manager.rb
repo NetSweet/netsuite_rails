@@ -8,7 +8,12 @@ module NetSuiteRails
           # TODO check to see if anything is changed before moving forward
           # if changes_keys.blank? && local_record.netsuite_manual_fields
 
-          unless opts[:modified_fields]
+          if opts[:modified_fields]
+            # if Array, we need to convert info fields hash based on the record definition
+            if opts[:modified_fields].is_a?(Array)
+              opts[:modified_fields] = all_netsuite_fields(local_record).select { |k,v| opts[:modified_fields].include?(k) }
+            end
+          else
             opts[:modified_fields] = modified_local_fields(local_record)
           end
 
@@ -50,7 +55,7 @@ module NetSuiteRails
           # input data; it's safest to limit the number of field changes pushed to NS
 
           custom_field_list = local_record.netsuite_field_map[:custom_field_list] || {}
-          modified_fields_list = opts[:modified_fields] || modified_local_fields(local_record)
+          modified_fields_list = opts[:modified_fields]
 
           update_list = {}
 
@@ -96,7 +101,7 @@ module NetSuiteRails
 
           # TODO need to normalize datetime fields
 
-          all_field_list = opts[:modified_fields] || modified_local_fields(local_record)
+          all_field_list = opts[:modified_fields]
           custom_field_list = local_record.netsuite_field_map[:custom_field_list] || {}
           field_hints = local_record.netsuite_field_hints
 
@@ -156,10 +161,7 @@ module NetSuiteRails
         end
 
         def modified_local_fields(local_record)
-          custom_netsuite_field_list = local_record.netsuite_field_map[:custom_field_list] || {}
-          standard_netsuite_field_list = local_record.netsuite_field_map.except(:custom_field_list) || {}
-
-          synced_netsuite_fields = custom_netsuite_field_list.merge(standard_netsuite_field_list)
+          synced_netsuite_fields = all_netsuite_fields(local_record)
 
           changed_keys = changed_attributes(local_record)
 
@@ -169,6 +171,13 @@ module NetSuiteRails
           end
 
           synced_netsuite_fields
+        end
+
+        def all_netsuite_fields(local_record)
+          custom_netsuite_field_list = local_record.netsuite_field_map[:custom_field_list] || {}
+          standard_netsuite_field_list = local_record.netsuite_field_map.except(:custom_field_list) || {}
+
+          custom_netsuite_field_list.merge(standard_netsuite_field_list)
         end
 
         def changed_attributes(local_record)
