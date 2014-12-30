@@ -43,7 +43,13 @@ module TestApplication
 
     def initialize!(&block)
       FileUtils.mkdir_p(Rails.root.join('db').to_s)
+
       super unless @initialized
+
+      unless ActiveRecord::Base.connection.table_exists?('netsuite_poll_timestamps')
+        require "generators/netsuite_rails/templates/create_netsuite_poll_timestamps.rb"
+        CreateNetsuitePollTimestamps.new.migrate(:up)
+      end
     end
   end
 end
