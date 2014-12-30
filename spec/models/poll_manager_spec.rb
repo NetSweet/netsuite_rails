@@ -28,4 +28,18 @@ describe NetSuiteRails::RecordSync::PollManager do
 
   	expect(NetSuite::Records::CustomList).to have_received(:get)
   end
+
+  it "should sync only available local records" do
+    NetSuiteRails::Configuration.netsuite_push_disabled true
+    StandardRecord.create! netsuite_id: 123
+    NetSuiteRails::Configuration.netsuite_push_disabled false
+
+    allow(NetSuite::Records::Customer).to receive(:get_list).and_return([OpenStruct.new(internal_id: 123)])
+    allow(NetSuiteRails::RecordSync::PollManager).to receive(:process_search_result_item)
+
+    NetSuiteRails::PollTrigger.update_local_records
+
+    expect(NetSuite::Records::Customer).to have_received(:get_list)
+  end
+
 end
