@@ -61,10 +61,6 @@ module NetSuiteRails
         self.netsuite_settings[:netsuite_field_map]
       end
 
-      # def netsuite_local_fields
-      #   @netsuite_field_map.except(:custom_field_list).keys + (@netsuite_field_map[:custom_field_list] || {}).keys
-      # end
-
       def netsuite_field_hints(list = nil)
         if !list.nil?
           self.netsuite_settings[:netsuite_field_hints] = list
