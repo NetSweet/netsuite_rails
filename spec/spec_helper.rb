@@ -10,6 +10,7 @@ require 'netsuite_rails'
 Dir[File.join(File.dirname(__FILE__), "support/**/*.rb")].each {|f| require f }
 
 TestApplication::Application.initialize!
+NetSuiteRails::PollTimestamp.delete_all
 
 RSpec.configure do |config|
   config.color = true
