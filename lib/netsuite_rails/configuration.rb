@@ -2,6 +2,8 @@ module NetSuiteRails
   module Configuration
     extend self
 
+    NETSUITE_MAX_PAGE_SIZE = 1000
+
     def reset!
       attributes.clear
     end
@@ -44,7 +46,7 @@ module NetSuiteRails
 
     def polling_page_size(size = nil)
       if size.nil?
-        attributes[:size] ||= 1000
+        attributes[:size] ||= NETSUITE_MAX_PAGE_SIZE
       else
         attributes[:size] = size
       end
