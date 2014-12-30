@@ -20,6 +20,12 @@ module ExampleModels
         end
 
       end
+
+      after do
+        NetSuiteRails::PollTrigger.instance_variable_set('@record_models', [])
+        NetSuiteRails::PollTrigger.instance_variable_set('@list_models', [])
+      end
+
     end
   end
 end
