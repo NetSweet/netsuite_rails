@@ -33,7 +33,7 @@ module NetSuiteRails
 
           Rails.logger.info "NetSuite: Syncing #{klass.to_s}"
           
-          preference = PollTimestamp.where(key: "netsuite_poll_#{klass.to_s.downcase}timestamp").first_or_initialize
+          preference = PollTimestamp.for_class(klass)
 
           # check if we've never synced before
           if preference.new_record?
