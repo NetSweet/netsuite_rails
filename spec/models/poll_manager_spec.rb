@@ -15,7 +15,7 @@ describe NetSuiteRails::RecordSync::PollManager do
   	expect(NetSuite::Records::Customer).to have_received(:search)
   end
 
-  pending "should poll and then get_list on saved search" do
+  skip "should poll and then get_list on saved search" do
     # TODO SS enabled record
     # TODO mock search to return one result
     # TODO mock out get_list
