@@ -44,23 +44,19 @@ describe NetSuiteRails::SyncTrigger do
     allow(s).to receive(:netsuite_pull)
     s.save!
 
-    delayer = Object.new
-    delayer.instance_eval { def netsuite_push(opts); end }
-    expect(delayer).to receive(:netsuite_push).with({:modified_fields=>[:phone]})
-
-    s.instance_eval do
-      def delay
-        delayer
-      end
-    end
+    # delayed_job isn't included in this gem; hack it into the current record instance
+    s.instance_eval { def delay; self; end }
+    allow(s).to receive(:delay).and_return(s)
 
     NetSuiteRails::Configuration.netsuite_sync_mode :async
-    allow(s).to receive(:delay).and_return(delayer)
 
     s.phone = Faker::PhoneNumber.phone_number
     s.save!
 
     NetSuiteRails::Configuration.netsuite_sync_mode :sync
+
+    expect(s).to have_received(:delay)
+    expect(NetSuiteRails::RecordSync::PushManager).to have_received(:push_update).with(anything, anything, {:modified_fields=>{:phone=> :phone}})
   end
 
 end
