@@ -55,6 +55,21 @@ module NetSuiteRails
           preference.save!
         end
       end
+
+      def update_local_records(opts = {})
+        record_models = opts[:record_models] || @record_models
+        list_models = opts[:list_models] || @list_models
+
+        # TODO only records are supported right now
+        # list_models.each do |klass|
+        #   Rails.logger.info "NetSuite: Syncing #{klass}"
+        #   klass.netsuite_poll
+        # end
+
+        record_models.each do |klass|
+          NetSuiteRails::RecordSync::PollManager.update_local_records(klass, opts)
+        end
+      end
       
     end
 

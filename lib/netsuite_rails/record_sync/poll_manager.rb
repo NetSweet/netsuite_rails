@@ -3,6 +3,31 @@ module NetSuiteRails
     module PollManager
       extend self
 
+      def update_local_records(klass, opts = {})
+        klass.select([:netsuite_id, :id]).find_in_batches(batch_size: NetSuiteRails::Configuration.polling_page_size) do |local_batch|
+          netsuite_batch = if klass.netsuite_custom_record?
+            NetSuite::Records::CustomRecord.get_list(
+              list: local_batch.map(&:netsuite_id),
+              type_id: klass.netsuite_custom_record_type_id,
+              allow_incomplete: true
+            )
+          else
+            klass.netsuite_record_class.get_list(
+              list: local_batch.map(&:netsuite_id),
+              allow_incomplete: true
+            )
+          end
+
+          unless netsuite_batch
+            binding.pry
+          end
+
+          netsuite_batch.each do |netsuite_record|
+            self.process_search_result_item(klass, opts, netsuite_record)
+          end
+        end
+      end
+
       def poll(klass, opts = {})
         opts = {
           import_all: false,
