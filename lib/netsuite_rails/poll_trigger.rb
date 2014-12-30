@@ -43,7 +43,7 @@ module NetSuiteRails
             last_poll_date = preference.value
             last_poll_date = DateTime.parse(last_poll_date) unless last_poll_date.is_a?(DateTime)
 
-            if DateTime.now - last_poll_date > sync_frequency
+            if DateTime.now.to_i - last_poll_date.to_i > sync_frequency
               Rails.logger.info "NetSuite: Syncing #{klass} modified since #{last_poll_date}"
               klass.netsuite_poll({ last_poll: last_poll_date }.merge(opts))
             else
