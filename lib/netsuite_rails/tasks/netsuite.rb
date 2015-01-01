@@ -27,7 +27,9 @@ namespace :netsuite do
   task :fresh_sync => :environment do
     NetSuiteRails::PollTimestamp.delete_all
 
-    ENV['SKIP_EXISTING'] = "true"
+    if ENV['SKIP_EXISTING'].blank?
+      ENV['SKIP_EXISTING'] = "true"
+    end
 
     Rake::Task["netsuite:sync"].invoke
   end
