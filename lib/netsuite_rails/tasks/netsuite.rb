@@ -39,7 +39,7 @@ namespace :netsuite do
     # need to eager load to ensure that all classes are loaded into the poll manager
     Rails.application.eager_load!
 
-    NetSuiteRails::PollTrigger.sync(self.generate_options)
+    NetSuiteRails::PollTrigger.sync(generate_options)
   end
 
   desc "sync all local netsuite records"
