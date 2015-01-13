@@ -1,5 +1,6 @@
 require 'netsuite'
 
+require 'netsuite_rails/configuration'
 require 'netsuite_rails/poll_timestamp'
 require 'netsuite_rails/transformations'
 require 'netsuite_rails/url_helper'
@@ -28,7 +29,7 @@ module NetSuiteRails
     end
 
     config.before_configuration do
-      require 'netsuite_rails/configuration'
+      require 'netsuite_rails/netsuite_configure'
     end
   end
 
