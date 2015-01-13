@@ -1,4 +1,5 @@
 require 'netsuite'
+require 'savon/mock/spec_helper'
 
 module NetSuiteRails::TestHelpers
 
@@ -81,4 +82,5 @@ end
 
 RSpec.configure do |config|
   config.include NetSuiteRails::TestHelpers, type: :feature
+  config.include Savon::SpecHelper
 end
