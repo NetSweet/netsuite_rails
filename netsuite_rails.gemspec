@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |s|
   s.name          = "netsuite_rails"
-  s.version       = "0.2.0"
+  s.version       = "0.2.1"
   s.authors       = ["Michael Bianco"]
   s.email         = ["mike@cliffsidemedia.com"]
   s.summary       = %q{Write Rails applications that integrate with NetSuite}
