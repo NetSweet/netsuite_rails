@@ -1,6 +1,5 @@
 require 'netsuite'
 
-require 'netsuite_rails/configuration'
 require 'netsuite_rails/poll_timestamp'
 require 'netsuite_rails/transformations'
 require 'netsuite_rails/url_helper'
@@ -26,6 +25,10 @@ module NetSuiteRails
   class Railtie < ::Rails::Railtie
     rake_tasks do
       load 'netsuite_rails/tasks/netsuite.rb'
+    end
+
+    config.before_configuration do
+      require 'netsuite_rails/configuration'
     end
   end
 
