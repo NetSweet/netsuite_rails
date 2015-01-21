@@ -130,7 +130,8 @@ module NetSuiteRails
         @netsuite_pulled ||= false
       end
 
-      def netsuite_pull
+      def netsuite_pull(opts = {})
+        # TODO need to support the opts hash
         netsuite_extract_from_record(netsuite_pull_record)
       end
 
@@ -149,6 +150,7 @@ module NetSuiteRails
         NetSuiteRails::RecordSync::PushManager.push(self, opts)
       end
 
+      # TODO move this login into separate service object
       def netsuite_extract_from_record(netsuite_record)
         @netsuite_pulling = true
 

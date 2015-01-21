@@ -83,7 +83,7 @@ module NetSuiteRails
       # You can force sync mode in different envoirnments with the global configuration variables
 
       if sync_options[:mode] == :sync || NetSuiteRails::Configuration.netsuite_sync_mode == :sync
-        local.send(action)
+        local.send(action, action_options)
       else
         action_options[:modified_fields] = NetSuiteRails::RecordSync::PushManager.modified_local_fields(local).keys
 
