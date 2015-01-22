@@ -41,8 +41,12 @@ module NetSuiteRails
 
         def push_add(local_record, netsuite_record, opts = {})
           if netsuite_record.add
-            # update_column to avoid triggering another save
-            local_record.update_column(:netsuite_id, netsuite_record.internal_id)
+            if is_active_record_model?(local_record)
+              # update_column to avoid triggering another save
+              local_record.update_column(:netsuite_id, netsuite_record.internal_id)
+            else
+              netsuite_record.internal_id
+            end
           else
             # TODO use NS error class
             raise "NetSuite: error creating record #{netsuite_record.errors}"
@@ -99,17 +103,11 @@ module NetSuiteRails
         def build_netsuite_record(local_record, opts = {})
           netsuite_record = build_netsuite_record_reference(local_record)
 
-          # TODO need to normalize datetime fields
-
           all_field_list = opts[:modified_fields]
           custom_field_list = local_record.netsuite_field_map[:custom_field_list] || {}
           field_hints = local_record.netsuite_field_hints
 
-          reflections = if NetSuiteRails.rails4?
-            local_record.class.reflections
-          else
-            local_record.reflections
-          end
+          reflections = relationship_attributes_list(local_record)
 
           all_field_list.each do |local_field, netsuite_field|
             # allow Procs as field mapping in the record definition for custom mapping
@@ -163,7 +161,11 @@ module NetSuiteRails
         def modified_local_fields(local_record)
           synced_netsuite_fields = all_netsuite_fields(local_record)
 
-          changed_keys = changed_attributes(local_record)
+          changed_keys = if is_active_record_model?(local_record)
+            changed_attributes(local_record)
+          else
+            local_record.changed_attributes
+          end
 
           # filter out unchanged keys when updating record
           unless local_record.new_netsuite_record?
@@ -186,11 +188,7 @@ module NetSuiteRails
 
           # TODO think about has_many / join table changes
 
-          reflections = if NetSuiteRails.rails4?
-            local_record.class.reflections
-          else
-            local_record.reflections
-          end
+          reflections = relationship_attributes_list(local_record)
 
           association_field_key_mapping = reflections.values.reject(&:collection?).inject({}) do |h, a|
             begin
@@ -216,6 +214,21 @@ module NetSuiteRails
           end
         end
 
+        def relationship_attributes_list(local_record)
+          if is_active_record_model?(local_record)
+            if NetSuiteRails.rails4?
+              local_record.class.reflections
+            else
+              local_record.reflections
+            end
+          else
+            local_record.respond_to?(:reflections) ? local_record.reflections : {}
+          end
+        end
+
+        def is_active_record_model?(local_record)
+          local_record.class.ancestors.include?(ActiveRecord::Base)
+        end
 
       end
     end

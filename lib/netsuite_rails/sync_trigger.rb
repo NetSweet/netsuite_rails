@@ -8,6 +8,9 @@ module NetSuiteRails
     #      if a model has a pending/complete state we might want to only push on complete
 
     def attach(klass)
+      # don't attach to non-AR backed models
+      return unless klass.ancestors.include?(ActiveRecord::Base)
+
       if klass.include?(SubListSync)
         klass.after_save { SyncTrigger.sublist_trigger(self) }
         klass.after_destroy { SyncTrigger.sublist_trigger(self) }
