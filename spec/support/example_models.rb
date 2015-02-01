@@ -14,11 +14,22 @@ module ExampleModels
           })
         end
 
+        define_model :custom_record, netsuite_id: :integer, value: :string do
+          include NetSuiteRails::RecordSync
+
+          netsuite_record_class NetSuite::Records::CustomRecord, 123
+          netsuite_sync :read_write
+          netsuite_field_map({
+            :custom_field_list => {
+              :value => :custrecord_another_value
+            }
+          })
+        end
+
         define_model :standard_list, netsuite_id: :integer, value: :string do
           include NetSuiteRails::ListSync
           netsuite_list_id 86
         end
-
       end
 
       after do
