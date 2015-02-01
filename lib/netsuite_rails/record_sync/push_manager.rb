@@ -100,7 +100,7 @@ module NetSuiteRails
         end
 
         def build_netsuite_record(local_record, opts = {})
-          netsuite_record = build_netsuite_record_reference(local_record)
+          netsuite_record = build_netsuite_record_reference(local_record, opts)
 
           all_field_list = opts[:modified_fields]
           custom_field_list = local_record.netsuite_field_map[:custom_field_list] || {}
@@ -145,13 +145,19 @@ module NetSuiteRails
           netsuite_record
         end
 
-        def build_netsuite_record_reference(local_record)
+        def build_netsuite_record_reference(local_record, opts = {})
           # must set internal_id for records on new; will be set to nil if new record
 
-          netsuite_record = local_record.netsuite_record_class.new(internal_id: local_record.netsuite_id)
+          init_hash = if opts[:use_external_id]
+            { external_id: local_record.netsuite_external_id }
+          else
+            { internal_id: local_record.netsuite_id }
+          end
+
+          netsuite_record = local_record.netsuite_record_class.new(init_hash)
 
           if local_record.netsuite_custom_record?
-            netsuite_record.rec_type = NetSuite::Records::CustomRecord.new(type_id: local_record.class.netsuite_custom_record_type_id, internal_id: local_record.netsuite_id)
+            netsuite_record.rec_type = NetSuite::Records::CustomRecord.new(internal_id: local_record.class.netsuite_custom_record_type_id)
           end
 
           netsuite_record
