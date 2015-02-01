@@ -23,6 +23,10 @@ module NetSuiteRails
     Rails::VERSION::MAJOR >= 4
   end
 
+  def self.configure(&block)
+    NetSuiteRails::Configuration.instance_eval(&block)
+  end
+
   class Railtie < ::Rails::Railtie
     rake_tasks do
       load 'netsuite_rails/tasks/netsuite.rb'
