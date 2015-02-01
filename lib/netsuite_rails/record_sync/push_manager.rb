@@ -21,10 +21,10 @@ module NetSuiteRails
 
           local_record.netsuite_execute_callbacks(local_record.class.before_netsuite_push, netsuite_record)
 
-          if !local_record.new_netsuite_record?
-            push_update(local_record, netsuite_record, opts)
-          else
+          if opts[:push_method] == :upsert || local_record.new_netsuite_record?
             push_add(local_record, netsuite_record, opts)
+          else
+            push_update(local_record, netsuite_record, opts)
           end
 
           # :aggressive is for custom fields which are based on input – need pull updated values after
@@ -40,7 +40,7 @@ module NetSuiteRails
         end
 
         def push_add(local_record, netsuite_record, opts = {})
-          if netsuite_record.add
+          if netsuite_record.send(opts[:push_method] || :add)
             if is_active_record_model?(local_record)
               # update_column to avoid triggering another save
               local_record.update_column(:netsuite_id, netsuite_record.internal_id)
@@ -48,7 +48,6 @@ module NetSuiteRails
               netsuite_record.internal_id
             end
           else
-            # TODO use NS error class
             raise "NetSuite: error creating record #{netsuite_record.errors}"
           end
         end
@@ -152,7 +151,7 @@ module NetSuiteRails
           netsuite_record = local_record.netsuite_record_class.new(internal_id: local_record.netsuite_id)
 
           if local_record.netsuite_custom_record?
-            netsuite_record.rec_type = NetSuite::Records::CustomRecord.new(internal_id: local_record.class.netsuite_custom_record_type_id)
+            netsuite_record.rec_type = NetSuite::Records::CustomRecord.new(type_id: local_record.class.netsuite_custom_record_type_id, internal_id: local_record.netsuite_id)
           end
 
           netsuite_record
