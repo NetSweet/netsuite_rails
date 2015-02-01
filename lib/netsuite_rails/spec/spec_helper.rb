@@ -81,6 +81,6 @@ module NetSuiteRails::TestHelpers
 end
 
 RSpec.configure do |config|
-  config.include NetSuiteRails::TestHelpers, type: :feature
+  config.include NetSuiteRails::TestHelpers
   config.include Savon::SpecHelper
 end
