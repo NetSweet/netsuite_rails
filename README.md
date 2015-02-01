@@ -4,7 +4,20 @@
 
 **Note:** Documentation is horrible... look at the code for details.
 
-Build custom Ruby on Rails applications that sync to NetSuite.
+Build Ruby on Rails applications that effortlessly sync to NetSuite. Here's an example:
+
+```ruby
+class Item < ActiveRecord::Base
+  include NetSuiteRails::RecordSync
+
+  netsuite_record_class NetSuite::Records::InventoryItem
+  netsuite_sync :read, frequency: 1.day
+  netsuite_field_map({
+    :item_number => :item_id,
+    :name => :display_name
+  })
+end
+```
 
 ## Installation
 
@@ -12,7 +25,7 @@ Build custom Ruby on Rails applications that sync to NetSuite.
 gem 'netsuite_rails'
 ```
 
-Install the database migration for poll timestamps
+Install the database migration to persist poll timestamps:
 
 ```bash
 rails g netsuite_rails:install
@@ -27,7 +40,21 @@ NetSuiteRails::Configuration.netsuite_instance_time_zone_offset(-6)
 
 ## Usage
 
-modes: :read, :read_write, :aggressive
+### Syncing Options
+
+```
+netsuite_record_class NetSuite::Records::Customer
+netsuite_record_class NetSuite::Records::CustomRecord, 123
+
+netsuite_sync: :read
+netsuite_sync: :read_write
+netsuite_sync: :aggressive
+
+netsuite_sync: :read, frequency: :never
+netsuite_sync: :read, frequency: 5.minutes
+netsuite_sync: :read, if: -> { self.condition_met? }
+
+```
 
 When using a proc in a NS mapping, you are responsible for setting local and remote values
 
@@ -35,7 +62,13 @@ for pushing tasks to DJ https://github.com/collectiveidea/delayed_job/wiki/Rake-
 
 `:if` for controlling when syncing occurs
 
-TODO hooks for before/after push/pull
+### Hooks
+
+```
+after_netsuite_pull
+before_netsuite_push
+after_netsuite_push
+```
 
 ### Syncing
 
@@ -43,12 +76,18 @@ TODO hooks for before/after push/pull
 rake netsuite:sync
 
 rake netsuite:fresh_sync
+
+rake netsuite:fresh_sync 
 ```
 
 Caveats:
 
 * If you have date time fields, or custom fields that will trigger `changed_attributes` this might cause issues when pulling an existing record
 * `changed_attributes` doesn't work well with store
+
+## Non-AR Backed Model
+
+Implement `changed_attributes` in your non-AR backed model
 
 ## Testing
 
