@@ -30,6 +30,20 @@ module ExampleModels
           include NetSuiteRails::ListSync
           netsuite_list_id 86
         end
+
+        define_model :external_id_record, netsuite_id: :integer, phone: :string do
+          include NetSuiteRails::RecordSync
+
+          netsuite_record_class NetSuite::Records::Customer
+          netsuite_sync :read_write
+          netsuite_field_map({
+            :phone => :phone
+          })
+
+          def netsuite_external_id
+            "phone-#{self.phone}"
+          end
+        end
       end
 
       after do
