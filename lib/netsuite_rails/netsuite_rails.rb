@@ -27,10 +27,6 @@ module NetSuiteRails
     rake_tasks do
       load 'netsuite_rails/tasks/netsuite.rb'
     end
-
-    config.before_configuration do
-      require 'netsuite_rails/netsuite_configure'
-    end
   end
 
 end
