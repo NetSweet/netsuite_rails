@@ -4,11 +4,11 @@ describe NetSuiteRails::PollTrigger do
   include ExampleModels
 
   it "should properly sync for the first time" do
-  	allow(StandardRecord).to receive(:netsuite_poll).with(hash_including(:import_all => true))
+  	allow(NetSuiteRails::RecordSync::PollManager).to receive(:poll)
 
   	NetSuiteRails::PollTrigger.sync list_models: []
 
-  	expect(StandardRecord).to have_received(:netsuite_poll)
+  	expect(NetSuiteRails::RecordSync::PollManager).to have_received(:poll)
   end
 
   it "should trigger syncing when the time has passed is greater than frequency" do
