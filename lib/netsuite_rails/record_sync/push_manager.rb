@@ -208,8 +208,16 @@ module NetSuiteRails
 
           changed_attributes_keys = local_record.changed_attributes.keys
 
-          # TODO documentation about serialized values
-          changed_attributes_keys += local_record.serialized_attributes.keys.map do |k|
+          serialized_attrs = if NetSuiteRails.rails4?
+            local_record.class.serialized_attributes
+          else
+            local_record.serialized_attributes
+          end
+
+          # changes_attributes does not track serialized attributes, although it does track the storage key
+          # if a serialized attribute storage key is dirty assume that all keys in the hash are dirty as well
+          
+          changed_attributes_keys += serialized_attrs.keys.map do |k|
             local_record.send(k.to_sym).keys.map(&:to_s)
           end.flatten
 
