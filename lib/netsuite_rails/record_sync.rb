@@ -136,6 +136,8 @@ module NetSuiteRails
       end
 
       def netsuite_pull_record
+        # TODO support use_external_id / netsuite_external_id
+
         if netsuite_custom_record?
           NetSuite::Records::CustomRecord.get(
             internal_id: self.netsuite_id,
@@ -199,7 +201,7 @@ module NetSuiteRails
           if field_hints.has_key?(local_field) && field_value.present?
             case field_hints[local_field]
             when :datetime
-              field_value = field_value.change(offset: "00:00") - (Time.zone.utc_offset / 3600).hours + (8 + NetSuiteRails::Configuration.netsuite_instance_time_zone_offset).hours
+              field_value = field_value.change(offset: Time.zone.formatted_offset) + (field_value.zone.to_i.abs + NetSuiteRails::Configuration.netsuite_instance_time_zone_offset).hours
             end
           end
 
