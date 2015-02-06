@@ -62,6 +62,21 @@ for pushing tasks to DJ https://github.com/collectiveidea/delayed_job/wiki/Rake-
 
 `:if` for controlling when syncing occurs
 
+Easily disable/enable syncing via env vars:
+
+```ruby
+NetSuiteRails.configure do
+  netsuite_pull_disabled ENV['NETSUITE_PULL_DISABLED'].present? && ENV['NETSUITE_PULL_DISABLED'] == "true"
+  netsuite_push_disabled ENV['NETSUITE_PUSH_DISABLED'].present? && ENV['NETSUITE_PUSH_DISABLED'] == "true"
+
+  if ENV['NETSUITE_DISABLE_SYNC'].present? && ENV['NETSUITE_DISABLE_SYNC'] == "true"
+    netsuite_pull_disabled true
+    netsuite_push_disabled true
+  end
+end
+
+```
+
 ### Hooks
 
 ```
