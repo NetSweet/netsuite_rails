@@ -5,11 +5,11 @@ namespace :netsuite do
       skip_existing: ENV['SKIP_EXISTING'].present? && ENV['SKIP_EXISTING'] == "true"
     }
 
-    if ENV['RECORD_MODELS'].present?
+    if !ENV['RECORD_MODELS'].nil?
       opts[:record_models] = ENV['RECORD_MODELS'].split(',').map(&:constantize)
     end
 
-    if ENV['LIST_MODELS'].present?
+    if !ENV['LIST_MODELS'].nil?
       opts[:list_models] = ENV['LIST_MODELS'].split(',').map(&:constantize)
     end
 
