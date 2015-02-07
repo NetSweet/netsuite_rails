@@ -163,10 +163,11 @@ module NetSuiteRails
         all_field_list = self.netsuite_field_map.except(:custom_field_list) || {}
         all_field_list.merge!(custom_field_list)
 
-        # self.netsuite_normalize_datetimes(:pull)
+        # TODO should have a helper module for common push/pull methods
+        reflection_attributes = NetSuiteRails::RecordSync::PushManager.relationship_attributes_list(self)
 
         # handle non-collection associations
-        association_keys = self.reflections.values.reject(&:collection?).map(&:name)
+        association_keys = reflection_attributes.values.reject(&:collection?).map(&:name)
 
         all_field_list.each do |local_field, netsuite_field|
           is_custom_field = custom_field_list.keys.include?(local_field)
@@ -188,7 +189,7 @@ module NetSuiteRails
           end
 
           if association_keys.include?(local_field)
-            field_value = self.reflections[local_field].klass.where(netsuite_id: field_value.internal_id).first_or_initialize
+            field_value = reflection_attributes[local_field].klass.where(netsuite_id: field_value.internal_id).first_or_initialize
           elsif is_custom_field
             field_value = NetSuiteRails::RecordSync::PullManager.extract_custom_field_value(field_value)
           else
