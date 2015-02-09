@@ -80,3 +80,7 @@ module NetSuiteRails
     end
   end
 end
+
+RSpec.configure do |config|
+  config.include NetSuiteRails::Spec::QueryHelpers
+end
