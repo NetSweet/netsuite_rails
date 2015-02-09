@@ -203,6 +203,7 @@ module NetSuiteRails
             case field_hints[local_field]
             when :datetime
               field_value = field_value.change(offset: Time.zone.formatted_offset) + (field_value.zone.to_i.abs + NetSuiteRails::Configuration.netsuite_instance_time_zone_offset).hours
+              field_value += 1 unless Time.now.dst?
             end
           end
 
