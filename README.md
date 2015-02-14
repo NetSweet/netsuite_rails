@@ -31,7 +31,19 @@ Install the database migration to persist poll timestamps:
 rails g netsuite_rails:install
 ```
 
-### Date & Time
+## Date
+
+
+## Time
+
+"Time of Day" fields in NetSuite are especially tricky. To ensure that times don't shift when you push them to NetSuite here are some tips:
+
+1. Take a look at the company time zone setup
+2. Ensure your WebService's Employee record has either:
+  * No time zone set
+  * The same time zone as the company
+3. Ensure that the WebService's GUI preferences have the same time zone settings as the company
+4. Set the `netsuite_instance_time_zone_offset` setting to your company's time zone
 
 ```ruby
 # set your timezone offset
