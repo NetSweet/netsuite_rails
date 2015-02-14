@@ -50,6 +50,10 @@ rails g netsuite_rails:install
 NetSuiteRails::Configuration.netsuite_instance_time_zone_offset(-6)
 ```
 
+### Changing WebService User's TimeZone Preferences
+
+It might take a couple hours for time zone changes to take effect. From my experience, either the time zone changes have some delay associated with them or the time zone implementation is extremely buggy.
+
 ## Usage
 
 ### Syncing Options
