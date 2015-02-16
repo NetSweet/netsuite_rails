@@ -101,14 +101,17 @@ before_netsuite_push
 after_netsuite_push
 ```
 
-### Syncing
+### Rake Tasks for Syncing
 
 ```bash
+# update & create local records modified in netsuite sync the last sync time
 rake netsuite:sync
 
+# pull all records in NetSuite and update/create local records
 rake netsuite:fresh_sync
 
-rake netsuite:fresh_sync 
+# only update records that have already been synced
+rake netsuite:sync_local RECORD_MODELS=YourModel
 ```
 
 Caveats:
