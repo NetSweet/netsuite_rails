@@ -90,7 +90,8 @@ module NetSuiteRails
             update_list[:rec_type] = netsuite_record.rec_type
           end
 
-          # TODO consider using upsert here
+          # don't update if list is empty
+          return if update_list.empty?
 
           if netsuite_record.update(update_list)
             true
