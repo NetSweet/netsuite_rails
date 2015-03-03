@@ -50,6 +50,10 @@ module NetSuiteRails
     def record_pull_trigger(local)
       return if NetSuiteRails::Configuration.netsuite_pull_disabled
 
+      sync_options = local.netsuite_sync_options
+
+      return if sync_options.has_key?(:pull_if) && !local.instance_exec(&sync_options[:pull_if])
+
       record_trigger_action(local, :netsuite_pull)
     end
 
