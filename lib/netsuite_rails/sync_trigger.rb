@@ -101,6 +101,11 @@ module NetSuiteRails
     end
 
     def sublist_trigger(sublist_item_rep)
+      # TODO don't trigger a push if the parent record is still pulling
+      # often sublists are managed in a after_pull hook; we want to prevent auto-pushing
+      # if sublist records are being updated. However, the netsuite_pulling? state is not persisted
+      # so there is no gaurentee that it isn't being pulled by checking parent.netsuite_pulling?
+
       parent = sublist_item_rep.send(sublist_item_rep.class.netsuite_sublist_parent)
       
       if parent.class.include?(RecordSync)
