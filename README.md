@@ -11,7 +11,13 @@ class Item < ActiveRecord::Base
   include NetSuiteRails::RecordSync
 
   netsuite_record_class NetSuite::Records::InventoryItem
-  netsuite_sync :read, frequency: 1.day
+  
+  netsuite_sync :read_write,
+    frequency: 1.day,
+    # limit pushing/pulling to/from NetSuite based on custom conditionals
+    if: -> { true },
+    pull_if: -> { true }
+  
   netsuite_field_map({
     :item_number => :item_id,
     :name => :display_name
