@@ -40,6 +40,9 @@ module NetSuiteRails
         end
 
         def push_add(local_record, netsuite_record, opts = {})
+          puts "NetSuite: Add #{netsuite_record.class}"
+
+          # push_method is either :add or :upsert
           if netsuite_record.send(opts[:push_method] || :add)
             if is_active_record_model?(local_record)
               # update_column to avoid triggering another save
@@ -89,6 +92,8 @@ module NetSuiteRails
           if local_record.netsuite_custom_record?
             update_list[:rec_type] = netsuite_record.rec_type
           end
+
+          puts "NetSuite: Update #{netsuite_record.class} #{netsuite_record.internal_id}, list #{update_list.keys}"
 
           # don't update if list is empty
           return if update_list.empty?
