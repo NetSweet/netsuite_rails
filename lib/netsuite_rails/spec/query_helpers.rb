@@ -52,12 +52,12 @@ module NetSuiteRails
               ]
             end + 
 
-            if record_class == NetSuite::Records::SalesOrder
+            if [ NetSuite::Records::SalesOrder, NetSuite::Records::ItemFulfillment, NetSuite::Records::Invoice ].include?(record_class)
               [
                 {
                   field: 'type',
                   operator: 'anyOf',
-                  value: [ '_salesOrder' ]
+                  value: [ '_' + record_class.name.demodulize.lower_camelcase ]
                 }
               ]
             else
@@ -66,6 +66,8 @@ module NetSuiteRails
             )
           }
         })
+
+        return nil if search.results.blank?
 
         if is_custom_record
           NetSuite::Records::CustomRecord.get(
