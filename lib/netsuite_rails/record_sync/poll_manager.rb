@@ -36,11 +36,12 @@ module NetSuiteRails
 
         opts[:netsuite_record_class] ||= klass.netsuite_record_class
         opts[:saved_search_id] ||= klass.netsuite_sync_options[:saved_search_id]
+        opts[:body_fields_only] ||= false
 
         search = opts[:netsuite_record_class].search(
           poll_criteria(klass, opts).merge({
             preferences: {
-              body_fields_only: false,
+              body_fields_only: opts[:body_fields_only],
               page_size: opts[:page_size]
             }
           })
@@ -164,7 +165,8 @@ module NetSuiteRails
       end
 
       def needs_get_list?(opts)
-        (opts[:saved_search_id].present? && opts[:full_record_data] != false) || opts[:full_record_data] == true
+        (opts[:saved_search_id].present? && opts[:full_record_data] != false) ||
+        opts[:full_record_data] == true
       end
 
       # TODO this should remain in the pull manager
