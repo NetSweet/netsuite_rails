@@ -78,6 +78,11 @@ module NetSuiteRails
           record_class.get(search.results.first.internal_id.to_i)
         end
       end
+      
+      # convenience method for inspecting objects in a live IRB session
+      def netsuite_url(object)
+        `open "#{NetSuiteRails::UrlHelper.netsuite_url(object)}"`
+      end
 
     end
   end
