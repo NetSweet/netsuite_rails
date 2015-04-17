@@ -23,6 +23,24 @@ module NetSuiteRails
     Rails::VERSION::MAJOR >= 4
   end
 
+  def self.configure_from_env(&block)
+    self.configure do
+      reset!
+
+      netsuite_pull_disabled ENV['NETSUITE_PULL_DISABLED'].present? && ENV['NETSUITE_PULL_DISABLED'] == "true"
+      netsuite_push_disabled ENV['NETSUITE_PUSH_DISABLED'].present? && ENV['NETSUITE_PUSH_DISABLED'] == "true"
+
+      if ENV['NETSUITE_DISABLE_SYNC'].present? && ENV['NETSUITE_DISABLE_SYNC'] == "true"
+        netsuite_pull_disabled true
+        netsuite_push_disabled true
+      end
+      
+      polling_page_size if ENV['NETSUITE_POLLING_PAGE_SIZE'].present?
+    end
+
+    self.configure(&block) if block
+  end
+
   def self.configure(&block)
     NetSuiteRails::Configuration.instance_eval(&block)
   end
