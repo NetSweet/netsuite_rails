@@ -2,8 +2,7 @@ require 'spec_helper'
 
 require 'netsuite_rails/spec/spec_helper'
 
-describe NetSuiteRails::TestHelpers do
-  include NetSuiteRails::TestHelpers
+describe 'netsuite_rails test helpers' do
   include ExampleModels
 
   let(:fake_search_results) { OpenStruct.new(results: [ OpenStruct.new(internal_id: 0) ]) }
