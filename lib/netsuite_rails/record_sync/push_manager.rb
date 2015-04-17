@@ -40,7 +40,7 @@ module NetSuiteRails
         end
 
         def push_add(local_record, netsuite_record, opts = {})
-          puts "NetSuite: Add #{netsuite_record.class}"
+          Rails.logger.info "NetSuite: Add #{netsuite_record.class}"
 
           # push_method is either :add or :upsert
           if netsuite_record.send(opts[:push_method] || :add)
@@ -93,7 +93,7 @@ module NetSuiteRails
             update_list[:rec_type] = netsuite_record.rec_type
           end
 
-          puts "NetSuite: Update #{netsuite_record.class} #{netsuite_record.internal_id}, list #{update_list.keys}"
+          Rails.logger.info "NetSuite: Update #{netsuite_record.class} #{netsuite_record.internal_id}, list #{update_list.keys}"
 
           # don't update if list is empty
           return if update_list.empty?

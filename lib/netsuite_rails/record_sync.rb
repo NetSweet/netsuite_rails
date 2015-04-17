@@ -154,7 +154,7 @@ module NetSuiteRails
 
       # TODO move this login into separate service object
       def netsuite_extract_from_record(netsuite_record)
-        puts "NetSuite: Pull #{netsuite_record.class} #{netsuite_record.internal_id}"
+        Rails.logger.info "NetSuite: Pull #{netsuite_record.class} #{netsuite_record.internal_id}"
 
         @netsuite_pulling = true
 
