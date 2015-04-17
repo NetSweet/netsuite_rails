@@ -80,6 +80,8 @@ netsuite_sync: :read, if: -> { self.condition_met? }
 
 When using a proc in a NS mapping, you are responsible for setting local and remote values
 
+The default sync frequency is [one day](https://github.com/NetSweet/netsuite_rails/blob/c453326a4190e68a2fd9d7690b2b1f2f105ec8b9/lib/netsuite_rails/poll_trigger.rb#L27).
+
 for pushing tasks to DJ https://github.com/collectiveidea/delayed_job/wiki/Rake-Task-as-a-Delayed-Job
 
 `:if` for controlling when syncing occurs
