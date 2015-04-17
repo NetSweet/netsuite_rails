@@ -20,7 +20,8 @@ module NetSuiteRails
 
       # https://system.sandbox.netsuite.com/app/common/scripting/scriptrecordlist.nl
       # https://system.sandbox.netsuite.com/app/common/scripting/script.nl
-
+      # https://system.sandbox.netsuite.com/app/common/entity/vendor.nl
+      
       if is_custom_record
         "#{prefix}/common/custom/custrecordentry.nl?id=#{internal_id}&rectype=#{record.class.netsuite_custom_record_type_id}"
       elsif [ NetSuite::Records::InventoryItem, NetSuite::Records::NonInventorySaleItem, NetSuite::Records::AssemblyItem].include?(record_class)
@@ -31,7 +32,15 @@ module NetSuiteRails
         "#{prefix}/common/entity/custjob.nl?id=#{internal_id}"
       elsif record_class == NetSuite::Records::Contact
         "#{prefix}/common/entity/contact.nl?id=#{internal_id}"
-      elsif [ NetSuite::Records::SalesOrder, NetSuite::Records::Invoice, NetSuite::Records::CustomerRefund ].include?(record_class)
+      elsif [
+        NetSuite::Records::SalesOrder,
+        NetSuite::Records::Invoice,
+        NetSuite::Records::CustomerRefund,
+        NetSuite::Records::CashSale,
+        NetSuite::Records::ItemFulfillment,
+        NetSuite::Records::CustomerDeposit,
+        NetSuite::Records::CustomerPayment
+        ].include?(record_class)
         "#{prefix}/accounting/transactions/transaction.nl?id=#{internal_id}"
       end
     end
