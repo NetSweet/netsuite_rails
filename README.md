@@ -9,21 +9,30 @@ Build Ruby on Rails applications that effortlessly sync to NetSuite. Here's an e
 ```ruby
 class Item < ActiveRecord::Base
   include NetSuiteRails::RecordSync
-
+  
+  # specify the NS record that your rails model maps to
   netsuite_record_class NetSuite::Records::InventoryItem
   
   netsuite_sync :read_write,
+    # specify the frequency that your app should poll NetSuite for updates
     frequency: 1.day,
     # limit pushing/pulling to/from NetSuite based on custom conditionals
     if: -> { true },
     pull_if: -> { true }
   
+  # local => remote field mapping
   netsuite_field_map({
     :item_number => :item_id,
     :name => :display_name
   })
 end
 ```
+
+Your ruby model:
+
+* Needs to have a `netsuite_id` & `netsuite_id=` method
+* Does not need to be an `ActiveRecord` model. If you don't use ActiveRecord you have to implement: TODO
+
 
 ## Installation
 
@@ -36,6 +45,8 @@ Install the database migration to persist poll timestamps:
 ```bash
 rails g netsuite_rails:install
 ```
+
+This helps netsuite_rails to know when the last time your rails DB was synced with the NS.
 
 ## Date
 
