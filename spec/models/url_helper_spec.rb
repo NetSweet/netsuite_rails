@@ -7,14 +7,16 @@ describe NetSuiteRails::UrlHelper do
   	c = NetSuite::Records::Customer.new internal_id: 123
   	url = NetSuiteRails::UrlHelper.netsuite_url(c)
 
-  	expect(url).to include("cust")
+  	expect(url).to include("ent")
+    expect(url).to include("123")
   end
 
   it "should handle a record sync enabled record" do
   	s = StandardRecord.new netsuite_id: 123
   	url = NetSuiteRails::UrlHelper.netsuite_url(s)
 
-  	expect(url).to include("cust")
+  	expect(url).to include("ent")
+    expect(url).to include("123")
   end
 
   it "should handle a list sync enabled record" do
