@@ -14,6 +14,8 @@ require 'netsuite_rails/record_sync/poll_manager'
 require 'netsuite_rails/record_sync/pull_manager'
 require 'netsuite_rails/record_sync/push_manager'
 
+require 'netsuite_rails/routines/company_contact_match'
+
 require 'netsuite_rails/list_sync'
 require 'netsuite_rails/list_sync/poll_manager'
 
