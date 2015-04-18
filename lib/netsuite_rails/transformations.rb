@@ -12,11 +12,15 @@ module NetSuiteRails
       end
 
       def phone(phone)
-        formatted_phone = phone.strip
-          .gsub(/ext(ension)?/, 'x')
-          .gsub(/[^0-9x ]/, '')
-          .gsub(/[ ]{2,}/m, ' ')
+        formatted_phone = phone.
+          strip.
+          gsub(/ext(ension)?/, 'x').
+          # remove anything that isn't a extension indicator or a number
+          gsub(/[^0-9x]/, '').
+          # if the first part of the phone # is 10 characters long and starts with a 1 the 22 char error is thrown
+          gsub(/^1([0-9]{10})/, '\1')
         
+        # eliminate the extension if the number is still too long
         formatted_phone.gsub!(/x.*$/, '') if formatted_phone.size > 22
 
         formatted_phone
