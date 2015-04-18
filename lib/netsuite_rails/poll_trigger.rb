@@ -27,16 +27,15 @@ module NetSuiteRails
           sync_frequency = klass.netsuite_sync_options[:frequency] || 1.day
 
           if sync_frequency == :never
-            Rails.logger.info "Not syncing #{klass.to_s}"
+            Rails.logger.info "NetSuite: Not syncing #{klass.to_s}"
             next
           end
 
-          Rails.logger.info "NetSuite: Syncing #{klass.to_s}"
-          
           preference = PollTimestamp.for_class(klass)
 
           # check if we've never synced before
           if preference.new_record?
+            Rails.logger.info "NetSuite: Syncing #{klass} for the first time"
             klass.netsuite_poll({ import_all: true }.merge(opts))
           else
             # TODO look into removing the conditional parsing; I don't think this is needed
