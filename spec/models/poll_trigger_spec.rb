@@ -6,7 +6,7 @@ describe NetSuiteRails::PollTrigger do
   it "should properly sync for the first time" do
   	allow(NetSuiteRails::RecordSync::PollManager).to receive(:poll)
 
-  	NetSuiteRails::PollTrigger.sync list_models: []
+  	NetSuiteRails::PollTrigger.sync list_models: [], record_models: [ StandardRecord ]
 
   	expect(NetSuiteRails::RecordSync::PollManager).to have_received(:poll)
   end
