@@ -49,7 +49,7 @@ module NetSuiteRails
 
         # TODO more robust error reporting
         unless search
-          raise 'error running netsuite sync'
+          raise "NetSuite: #{klass}. Error running NS search. Most likely a search timeout."
         end
 
         process_search_results(klass, opts, search)
@@ -117,7 +117,7 @@ module NetSuiteRails
           full_record_data: -1,
         }.merge(opts)
 
-        Rails.logger.info "NetSuite: Processing #{search.total_records} over #{search.total_pages} pages"
+        Rails.logger.info "NetSuite: Syncing #{klass}. Processing #{search.total_records} over #{search.total_pages} pages"
 
         # TODO need to improve the conditional here to match the get_list call conditional belo
         if opts[:import_all] && opts[:skip_existing]
