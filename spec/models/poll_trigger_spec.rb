@@ -4,26 +4,26 @@ describe NetSuiteRails::PollTrigger do
   include ExampleModels
 
   it "should properly sync for the first time" do
-  	allow(NetSuiteRails::RecordSync::PollManager).to receive(:poll)
+    allow(NetSuiteRails::RecordSync::PollManager).to receive(:poll)
 
-  	NetSuiteRails::PollTrigger.sync list_models: [], record_models: [ StandardRecord ]
+    NetSuiteRails::PollTrigger.sync list_models: [], record_models: [ StandardRecord ]
 
-  	expect(NetSuiteRails::RecordSync::PollManager).to have_received(:poll)
+    expect(NetSuiteRails::RecordSync::PollManager).to have_received(:poll)
   end
 
   it "should trigger syncing is triggered from the model when time passed is greater than frequency" do
-  	allow(StandardRecord).to receive(:netsuite_poll)
+    allow(StandardRecord).to receive(:netsuite_poll)
     allow(StandardRecord.netsuite_record_class).to receive(:search).and_return(OpenStruct.new(results: []))
 
-  	StandardRecord.netsuite_sync_options[:frequency] = 5.minutes
+    StandardRecord.netsuite_sync_options[:frequency] = 5.minutes
 
-  	timestamp = NetSuiteRails::PollTimestamp.for_class(StandardRecord)
-  	timestamp.value = DateTime.now - 6.minutes
-  	timestamp.save!
+    timestamp = NetSuiteRails::PollTimestamp.for_class(StandardRecord)
+    timestamp.value = DateTime.now - 6.minutes
+    timestamp.save!
 
-  	NetSuiteRails::PollTrigger.sync list_models: [], record_models: [ StandardRecord ]
+    NetSuiteRails::PollTrigger.sync list_models: [], record_models: [ StandardRecord ]
 
-  	expect(StandardRecord).to have_received(:netsuite_poll)
+    expect(StandardRecord).to have_received(:netsuite_poll)
   end
 
   it 'should not change the poll timestamp when sync does not occur' do
