@@ -7,6 +7,6 @@ describe NetSuiteRails::Transformations do
     expect(NetSuiteRails::Transformations.phone(long_phone_number)).to eq('5498804834x51077')
 
     weird_long_phone_number = '12933901964x89914'
-    expect(NetSuiteRails::Transformations.phone(weird_long_phone_number)).to eq('2933901964 x89914')
+    expect(NetSuiteRails::Transformations.phone(weird_long_phone_number)).to eq('2933901964x89914')
   end
 end
