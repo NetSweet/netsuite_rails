@@ -25,6 +25,7 @@ namespace :netsuite do
 
   desc "Sync all NetSuite records using import_all"
   task :fresh_sync => :environment do
+    # TODO only delete records that are included in RECORD_MODELS
     NetSuiteRails::PollTimestamp.delete_all
 
     if ENV['SKIP_EXISTING'].blank?
