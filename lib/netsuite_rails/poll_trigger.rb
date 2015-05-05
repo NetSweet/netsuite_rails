@@ -31,15 +31,16 @@ module NetSuiteRails
             next
           end
 
-          preference = PollTimestamp.for_class(klass)
+          last_class_poll = PollTimestamp.for_class(klass)
+          poll_execution_time = DateTime.now
 
           # check if we've never synced before
-          if preference.new_record?
+          if last_class_poll.new_record?
             Rails.logger.info "NetSuite: Syncing #{klass} for the first time"
             klass.netsuite_poll({ import_all: true }.merge(opts))
           else
             # TODO look into removing the conditional parsing; I don't think this is needed
-            last_poll_date = preference.value
+            last_poll_date = last_class_poll.value
             last_poll_date = DateTime.parse(last_poll_date) unless last_poll_date.is_a?(DateTime)
 
             if DateTime.now.to_i - last_poll_date.to_i > sync_frequency
@@ -47,11 +48,12 @@ module NetSuiteRails
               klass.netsuite_poll({ last_poll: last_poll_date }.merge(opts))
             else
               Rails.logger.info "NetSuite: Skipping #{klass} because of syncing frequency"
+              next
             end
           end
 
-          preference.value = DateTime.now
-          preference.save!
+          last_class_poll.value = poll_execution_time
+          last_class_poll.save!
         end
       end
 
