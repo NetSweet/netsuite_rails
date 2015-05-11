@@ -44,7 +44,7 @@ module NetSuiteRails
             last_poll_date = DateTime.parse(last_poll_date) unless last_poll_date.is_a?(DateTime)
 
             if DateTime.now.to_i - last_poll_date.to_i > sync_frequency
-              Rails.logger.info "NetSuite: Syncing #{klass} modified since #{last_poll_date}"
+              Rails.logger.info "NetSuite: #{klass} is due to be synced, last checked #{last_poll_date}"
               klass.netsuite_poll({ last_poll: last_poll_date }.merge(opts))
             else
               Rails.logger.info "NetSuite: Skipping #{klass} because of syncing frequency"
