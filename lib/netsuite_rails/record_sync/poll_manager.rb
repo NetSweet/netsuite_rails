@@ -137,6 +137,7 @@ module NetSuiteRails
             end
 
             if filtered_netsuite_id_list.present?
+              Rails.logger.info "NetSuite: Syncing #{klass}. Running get_list for #{filtered_netsuite_id_list.length} records"
               opts[:netsuite_record_class].get_list(list: filtered_netsuite_id_list)
             else
               []
