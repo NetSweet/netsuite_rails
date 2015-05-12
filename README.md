@@ -138,6 +138,15 @@ Caveats:
 * If you have date time fields, or custom fields that will trigger `changed_attributes` this might cause issues when pulling an existing record
 * `changed_attributes` doesn't work well with store
 
+### Delayed Job
+
+The more records that use netsuite_rails, the longer you'll need your job timeout to be:
+
+```ruby
+# config/initializers/delayed_job.rb
+Delayed::Worker.max_run_time = 80.minutes
+```
+
 ## Non-AR Backed Model
 
 Implement `changed_attributes` in your non-AR backed model
