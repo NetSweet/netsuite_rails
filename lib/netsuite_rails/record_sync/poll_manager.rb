@@ -117,14 +117,14 @@ module NetSuiteRails
           full_record_data: -1,
         }.merge(opts)
 
-        Rails.logger.info "NetSuite: Syncing #{klass}. Processing #{search.total_records} over #{search.total_pages} pages"
-
         # TODO need to improve the conditional here to match the get_list call conditional belo
         if opts[:import_all] && opts[:skip_existing]
           synced_netsuite_list = klass.pluck(:netsuite_id)
         end
         
         search.results_in_batches do |batch|
+          Rails.logger.info "NetSuite: Syncing #{klass}. Current Page: #{search.current_page}. Processing #{search.total_records} over #{search.total_pages} pages."
+
           # a saved search is processed as a advanced search; advanced search often does not allow you to retrieve
           # all of the fields (ex: addressbooklist on customer) that a normal search does
           # the only way to get those fields is to pull down the full record again using getAll
