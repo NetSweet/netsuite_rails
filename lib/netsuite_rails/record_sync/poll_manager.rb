@@ -19,7 +19,7 @@ module NetSuiteRails
           end
 
           unless netsuite_batch
-            binding.pry
+            raise "NetSuite: #{klass}. Error running NS search. No Netsuite batch found. Most likely a search timeout."
           end
 
           netsuite_batch.each do |netsuite_record|
