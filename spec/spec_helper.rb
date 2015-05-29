@@ -10,6 +10,8 @@ require 'netsuite_rails'
 Dir[File.join(File.dirname(__FILE__), "support/**/*.rb")].each {|f| require f }
 
 TestApplication::Application.initialize!
+
+# TODO use DB cleaner instead
 NetSuiteRails::PollTimestamp.delete_all
 
 RSpec.configure do |config|
