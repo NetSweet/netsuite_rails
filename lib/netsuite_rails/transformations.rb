@@ -19,7 +19,7 @@ module NetSuiteRails
           gsub(/[^0-9x]/, '').
           # if the first part of the phone # is 10 characters long and starts with a 1 the 22 char error is thrown
           gsub(/^1([0-9]{10})/, '\1')
-
+        
         # eliminate the extension if the number is still too long
         formatted_phone.gsub!(/x.*$/, '') if formatted_phone.size > 22
 
@@ -40,7 +40,7 @@ module NetSuiteRails
       end
 
       def datetime(datetime)
-        datetime.change(offset: "-08:00") - (8 + NetSuiteRails::Configuration.netsuite_instance_time_zone_offset).hours - (DateTime.now.in_time_zone("Pacific Time (US & Canada)").dst?? 1 : 0).hours
+        datetime.change(offset: "-08:00") - (8 + NetSuiteRails::Configuration.netsuite_instance_time_zone_offset).hours
       end
 
     end
