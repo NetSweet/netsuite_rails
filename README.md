@@ -9,17 +9,17 @@ Build Ruby on Rails applications that effortlessly sync to NetSuite. Here's an e
 ```ruby
 class Item < ActiveRecord::Base
   include NetSuiteRails::RecordSync
-  
+
   # specify the NS record that your rails model maps to
   netsuite_record_class NetSuite::Records::InventoryItem
-  
+
   netsuite_sync :read_write,
     # specify the frequency that your app should poll NetSuite for updates
     frequency: 1.day,
     # limit pushing/pulling to/from NetSuite based on custom conditionals
     if: -> { true },
     pull_if: -> { true }
-  
+
   # local => remote field mapping
   netsuite_field_map({
     :item_number => :item_id,
@@ -55,11 +55,11 @@ This helps netsuite_rails to know when the last time your rails DB was synced wi
 
 "Time of Day" fields in NetSuite are especially tricky. To ensure that times don't shift when you push them to NetSuite here are some tips:
 
-1. Take a look at the company time zone setup
+1. Take a look at the company time zone setup. This is in Setup
 2. Ensure your WebService's Employee record has either:
   * No time zone set
   * The same time zone as the company
-3. Ensure that the WebService's GUI preferences have the same time zone settings as the company
+3. Ensure that the WebService's GUI preferences have the same time zone settings as the company. This effects how times are translated via SuiteTalk.
 4. Set the `netsuite_instance_time_zone_offset` setting to your company's time zone
 
 ```ruby
@@ -114,10 +114,15 @@ end
 
 ### Hooks
 
-```
-after_netsuite_pull
+```ruby
+# the netsuite record is passed a single argument to this block (or method reference)
+# this provides the opportunity to set custom fields or run custom logic to prepare
+# the record for the NetSuite envoirnment
 before_netsuite_push
 after_netsuite_push
+
+# netsuite_pulling? is true when this callback is executed
+after_netsuite_pull
 ```
 
 ### Rake Tasks for Syncing
@@ -130,13 +135,13 @@ rake netsuite:sync
 rake netsuite:fresh_sync
 
 # only update records that have already been synced
-rake netsuite:sync_local RECORD_MODELS=YourModel
+rake netsuite:sync_local RECORD_MODELS=YourModel LIST_MODELS=YourListModel
 ```
 
 Caveats:
 
 * If you have date time fields, or custom fields that will trigger `changed_attributes` this might cause issues when pulling an existing record
-* `changed_attributes` doesn't work well with store
+* `changed_attributes` doesn't work well with `store`s
 
 ### Delayed Job
 
