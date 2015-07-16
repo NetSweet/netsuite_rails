@@ -24,6 +24,6 @@ describe NetSuiteRails::Transformations do
 
     transformed_date = NetSuiteRails::Transformations.datetime(local_date)
     # TODO this will break as PDT daylight savings is switched; need to freeze the system time for testing
-    expect(transformed_date.to_s).to eq('2015-05-29T08:52:47-08:00')
+    expect(transformed_date.to_s).to eq('2015-05-29T11:52:47-06:00')
   end
 end
