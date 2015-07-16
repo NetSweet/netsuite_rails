@@ -39,13 +39,14 @@ module NetSuiteRails
       def date(date, direction = :push)
         case direction
         when :push
-          date.change(offset: "-08:00",
-                      hour: 8 + NetSuiteRails::Configuration.netsuite_instance_time_zone_offset)
+          dst_offset = Time.now.in_time_zone( Time.zone ).dst? ? 1 : 0
+          # dates in NS are really datetimes on the backend, need to set the timezone on them
+          date.to_datetime
+              .change(offset: (NetSuiteRails::Configuration.netsuite_instance_time_zone_offset +
+                              dst_offset).to_s)
         when :pull
-          date.change(offset: 0,
-                      hour: date.hour + 8 +
-                            NetSuiteRails::Configuration.netsuite_instance_time_zone_offset
-                      ).strftime("%y-%m-%d")
+          # see comment above
+          date.in_time_zone( Time.zone ).to_date
         else
           raise "Unknown sync direction #{direction.to_s} for NetSuiteRails::Transformations date transfomation"
         end
