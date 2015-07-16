@@ -54,7 +54,7 @@ module NetSuiteRails
       def datetime(datetime, direction = :push)
         case direction
         when :push
-          dst_offset = Time.now.in_time_zone("Pacific Time (US & Canada)").dst? ? 1 : 0
+          dst_offset = Time.now.in_time_zone( Time.zone ).dst? ? 1 : 0
           datetime.change(offset: (NetSuiteRails::Configuration.netsuite_instance_time_zone_offset +
                                    dst_offset).to_s,
                           hour:   datetime.hour + dst_offset,
