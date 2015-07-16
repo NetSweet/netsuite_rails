@@ -2,16 +2,17 @@ module NetSuiteRails
   module Transformations
     class << self
 
-      def transform(type, value)
-        self.send(type, value)
+      # accepts an optional direction flag (:pull or :push) as a third parameter
+      def transform(type, *value)
+        self.send(type, *value)
       end
 
       # NS limits firstname fields to 33 characters
-      def firstname(firstname)
+      def firstname(firstname, direction = nil)
         firstname[0..33]
       end
 
-      def phone(phone)
+      def phone(phone, direction = nil)
         formatted_phone = phone.
           strip.
           gsub(/ext(ension)?/, 'x').
@@ -27,7 +28,7 @@ module NetSuiteRails
       end
 
       # NS will throw an error if whitespace bumpers the email string
-      def email(email)
+      def email(email, direction = nil)
         email.strip
       end
 
@@ -35,12 +36,28 @@ module NetSuiteRails
       # http://stackoverflow.com/questions/16818180/ruby-rails-how-do-i-change-the-timezone-of-a-time-without-changing-the-time
       # http://alwayscoding.ca/momentos/2013/08/22/handling-dates-and-timezones-in-ruby-and-rails/
 
-      def date(date)
-        date.change(offset: "-08:00", hour: 24 - (8 + NetSuiteRails::Configuration.netsuite_instance_time_zone_offset))
+      def date(date, direction = :push)
+        case direction
+        when :push
+          date.change(offset: "-08:00", hour: 24 - (8 + NetSuiteRails::Configuration.netsuite_instance_time_zone_offset))
+        when :pull
+          # currently not implemented on master
+        else
+          raise "Unknown sync direction #{direction.to_s} for NetSuiteRails::Transformations date transfomation"
+        end
       end
 
-      def datetime(datetime)
-        datetime.change(offset: "-08:00") - (8 + NetSuiteRails::Configuration.netsuite_instance_time_zone_offset).hours - (DateTime.now.in_time_zone("Pacific Time (US & Canada)").dst?? 1 : 0).hours
+      def datetime(datetime, direction = :push)
+        case direction
+        when :push
+          datetime.change(offset: "-08:00") - (8 + NetSuiteRails::Configuration.netsuite_instance_time_zone_offset).hours - (DateTime.now.in_time_zone("Pacific Time (US & Canada)").dst?? 1 : 0).hours
+        when :pull
+          datetime = datetime.change(offset: Time.zone.formatted_offset) + (datetime.zone.to_i.abs + NetSuiteRails::Configuration.netsuite_instance_time_zone_offset).hours
+          datetime += 1 unless Time.now.dst?
+          datetime
+        else
+          raise "Unknown sync direction #{direction.to_s} for NetSuiteRails::Transformations datetime transfomation"
+        end
       end
 
     end
