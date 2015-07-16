@@ -200,13 +200,8 @@ module NetSuiteRails
 
           # TODO should we just check for nil? vs present?
 
-          # TODO should be moved to Transformations with a direction flag
           if field_hints.has_key?(local_field) && field_value.present?
-            case field_hints[local_field]
-            when :datetime
-              field_value = field_value.change(offset: Time.zone.formatted_offset) + (field_value.zone.to_i.abs + NetSuiteRails::Configuration.netsuite_instance_time_zone_offset).hours
-              field_value += 1 unless Time.now.dst?
-            end
+            field_value = NetSuiteRails::Transformations.transform(field_hints[local_field], field_value, :pull)
           end
 
           self.send(:"#{local_field}=", field_value)
