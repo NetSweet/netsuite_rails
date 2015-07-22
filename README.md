@@ -16,9 +16,12 @@ class Item < ActiveRecord::Base
   netsuite_sync :read_write,
     # specify the frequency that your app should poll NetSuite for updates
     frequency: 1.day,
+    # it's possible to base syncing off of a saved search. Be sure that "Internal ID" is one of your search result columns
+    saved_search_id: 123,
     # limit pushing/pulling to/from NetSuite based on custom conditionals
     if: -> { true },
     pull_if: -> { true }
+    
 
   # local => remote field mapping
   netsuite_field_map({
