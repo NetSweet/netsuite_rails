@@ -35,6 +35,7 @@ module NetSuiteRails
         }.merge(opts)
 
         opts[:netsuite_record_class] ||= klass.netsuite_record_class
+        opts[:netsuite_custom_record_type_id] ||= klass.netsuite_custom_record_type_id if opts[:custom_record_class] == NetSuite::Records::CustomRecord
         opts[:saved_search_id] ||= klass.netsuite_sync_options[:saved_search_id]
         opts[:body_fields_only] ||= false
 
@@ -91,7 +92,7 @@ module NetSuiteRails
 
         if opts[:netsuite_record_class] == NetSuite::Records::CustomRecord
           opts[:netsuite_custom_record_type_id] ||= klass.netsuite_custom_record_type_id
-          
+
           criteria << {
             field: 'recType',
             operator: 'is',
@@ -121,7 +122,7 @@ module NetSuiteRails
         if opts[:import_all] && opts[:skip_existing]
           synced_netsuite_list = klass.pluck(:netsuite_id)
         end
-        
+
         search.results_in_batches do |batch|
           Rails.logger.info "NetSuite: Syncing #{klass}. Current Page: #{search.current_page}. Processing #{search.total_records} over #{search.total_pages} pages."
 
@@ -138,7 +139,15 @@ module NetSuiteRails
 
             if filtered_netsuite_id_list.present?
               Rails.logger.info "NetSuite: Syncing #{klass}. Running get_list for #{filtered_netsuite_id_list.length} records"
-              opts[:netsuite_record_class].get_list(list: filtered_netsuite_id_list)
+
+              if opts[:netsuite_record_class] == NetSuite::Records::CustomRecord
+                NetSuite::Records::CustomRecord.get_list(
+                  list: filtered_netsuite_id_list,
+                  type_id: opts[:netsuite_custom_record_type_id]
+                )
+              else
+                opts[:netsuite_record_class].get_list(list: filtered_netsuite_id_list)
+              end
             else
               []
             end
@@ -183,7 +192,7 @@ module NetSuiteRails
 
         custom_field_value
       end
-      
+
     end
   end
 end
