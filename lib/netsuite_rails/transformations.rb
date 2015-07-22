@@ -56,15 +56,17 @@ module NetSuiteRails
         case direction
         when :push
           dst_offset = Time.now.in_time_zone( Time.zone ).dst? ? 1 : 0
-          datetime.change(offset: (NetSuiteRails::Configuration.netsuite_instance_time_zone_offset +
-                                   dst_offset).to_s,
-                          hour:   datetime.hour + dst_offset,
-                          min:    datetime.minute,
-                          sec:    datetime.second)
+          netsuite_offset = Configuration.netsuite_instance_time_zone_offset + dst_offset
+          datetime.change(offset: Time.zone.formatted_offset)
+                  .in_time_zone( ActiveSupport::TimeZone[netsuite_offset] )
         when :pull
-          datetime = datetime.change(offset: Time.zone.formatted_offset) + (datetime.zone.to_i.abs + NetSuiteRails::Configuration.netsuite_instance_time_zone_offset).hours
-          datetime += 1 unless Time.now.dst?
-          datetime
+          # ActiveRecord saves datetimes in UTC
+          binding.pry
+          converted_time = datetime.in_time_zone( Time.zone )
+          DateTime.new.change(offset: 0,
+                              year: Time.now.year,
+                              hour: converted_time.hour,
+                              min: converted_time.min)
         else
           raise "Unknown sync direction #{direction.to_s} for NetSuiteRails::Transformations datetime transfomation"
         end
