@@ -39,8 +39,14 @@ module NetSuiteRails
         date.change(offset: "-08:00", hour: 24 - (8 + NetSuiteRails::Configuration.netsuite_instance_time_zone_offset))
       end
 
-      def datetime(datetime)
-        datetime.change(offset: "-08:00") - (8 + NetSuiteRails::Configuration.netsuite_instance_time_zone_offset).hours - (DateTime.now.in_time_zone("Pacific Time (US & Canada)").dst?? 1 : 0).hours
+      def datetime(datetime, direction = :push)
+        if direction == :push
+          datetime.change(offset: "-08:00") - (8 + NetSuiteRails::Configuration.netsuite_instance_time_zone_offset).hours - (DateTime.now.in_time_zone("Pacific Time (US & Canada)").dst?? 1 : 0).hours
+        else
+          datetime = datetime.change(offset: Time.zone.formatted_offset) + (datetime.zone.to_i.abs + NetSuiteRails::Configuration.netsuite_instance_time_zone_offset).hours
+          datetime += 1 unless Time.now.dst?
+          datetime
+        end
       end
 
     end
