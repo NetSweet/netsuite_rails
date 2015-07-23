@@ -35,7 +35,7 @@ module NetSuiteRails
         }.merge(opts)
 
         opts[:netsuite_record_class] ||= klass.netsuite_record_class
-        opts[:netsuite_custom_record_type_id] ||= klass.netsuite_custom_record_type_id if opts[:custom_record_class] == NetSuite::Records::CustomRecord
+        opts[:netsuite_custom_record_type_id] ||= klass.netsuite_custom_record_type_id if opts[:netsuite_record_class] == NetSuite::Records::CustomRecord
         opts[:saved_search_id] ||= klass.netsuite_sync_options[:saved_search_id]
         opts[:body_fields_only] ||= false
 
