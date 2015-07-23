@@ -134,7 +134,7 @@ module NetSuiteRails
             end
 
             if field_hints.has_key?(local_field) && netsuite_field_value.present?
-              netsuite_field_value = NetSuiteRails::Transformations.transform(field_hints[local_field], netsuite_field_value)
+              netsuite_field_value = NetSuiteRails::Transformations.transform(field_hints[local_field], netsuite_field_value, :push)
             end
 
             # TODO should we skip setting nil values completely? What if we want to nil out fields on update?
