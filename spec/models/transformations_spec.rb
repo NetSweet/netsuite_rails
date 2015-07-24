@@ -5,6 +5,14 @@ require 'spec_helper'
 # the tests + implementation may still not be correct.
 
 describe NetSuiteRails::Transformations do
+  before do
+    ENV['TZ'] = 'EST'
+    Rails.configuration.time_zone = 'Eastern Time (US & Canada)'
+    Time.zone = ActiveSupport::TimeZone[-5]
+
+    NetSuiteRails::Configuration.netsuite_instance_time_zone_offset -6
+  end
+
   it 'handles very long phone numbers' do
     long_phone_number = '+1 (549)-880-4834 ext. 51077'
 
@@ -15,13 +23,15 @@ describe NetSuiteRails::Transformations do
   end
 
   it "translates local date into NS date" do
+    # from what I can tell, NetSuite stores dates with a -07:00 offset
+    # and subtracts (PST - NS instance timezone) hours from the stored datetime
 
+    local_date = DateTime.parse("2015-07-24T00:00:00.000-05:00")
+    transformed_date = NetSuiteRails::Transformations.date(local_date, :push)
+    expect(transformed_date.to_s).to eq("2015-07-24T22:00:00-07:00")
   end
 
   it "translates local datetime into NS datetime" do
-    ENV['TZ'] = 'EST'
-    Time.zone = ActiveSupport::TimeZone[-5]
-
     # TODO set local timezone
     local_date = DateTime.parse('Fri May 29 11:52:47 EDT 2015')
     NetSuiteRails::Configuration.netsuite_instance_time_zone_offset -6
@@ -32,12 +42,6 @@ describe NetSuiteRails::Transformations do
   end
 
   it 'transforms a datetime value pulled from netsuite correctly' do
-    ENV['TZ'] = 'EST'
-    Rails.configuration.time_zone = 'Eastern Time (US & Canada)'
-    Time.zone = ActiveSupport::TimeZone[-5]
-
-    NetSuiteRails::Configuration.netsuite_instance_time_zone_offset -6
-
     # assuming that the date in CST is displayed as 5am
     # in the rails backend we want to store the date as EST with a CST hour
 
