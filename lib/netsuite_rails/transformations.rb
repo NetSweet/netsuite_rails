@@ -49,9 +49,11 @@ module NetSuiteRails
 
       def date(date, direction = :push)
         if direction == :push
-          date.change(offset: "-07:00", hour: 24 - (8 + NetSuiteRails::Configuration.netsuite_instance_time_zone_offset))
+          # setting the hour to noon eliminates the chance that some strange timezone offset
+          # shifting would cause the date to drift into the next or previous day
+          date.to_datetime.change(offset: "-07:00", hour: 12)
         else
-          date.change(offset: Time.zone.formatted_offset) + (8 + NetSuiteRails::Configuration.netsuite_instance_time_zone_offset).hours
+          date.change(offset: Time.zone.formatted_offset)
         end
       end
 
