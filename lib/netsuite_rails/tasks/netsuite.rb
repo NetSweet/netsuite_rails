@@ -50,4 +50,30 @@ namespace :netsuite do
     NetSuiteRails::PollTrigger.update_local_records(generate_options)
   end
 
+  task field_usage_report: :environment do |t|
+    Rails.application.eager_load!
+
+    NetSuiteRails::PollTrigger.instance_variable_get('@record_models').each do |record_model|
+      puts record_model.to_s
+
+      # TODO add the ability to document which fields
+
+      standard_fields = record_model.netsuite_field_map.values - [record_model.netsuite_field_map[:custom_field_list]]
+      custom_fields = record_model.netsuite_field_map[:custom_field_list].values
+
+      standard_fields.reject! { |f| f.is_a?(Proc) }
+      custom_fields.reject! { |f| f.is_a?(Proc) }
+
+      if custom_fields.present?
+        puts "Custom Fields: #{custom_fields.join(', ')}"
+      end
+
+      if standard_fields.present?
+        puts "Standard Fields: #{standard_fields.join(', ')}"
+      end
+
+      puts ""
+    end
+  end
+
 end
