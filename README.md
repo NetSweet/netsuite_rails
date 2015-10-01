@@ -21,7 +21,7 @@ class Item < ActiveRecord::Base
     # limit pushing/pulling to/from NetSuite based on custom conditionals
     if: -> { true },
     pull_if: -> { true }
-    
+
 
   # local => remote field mapping
   netsuite_field_map({
@@ -84,7 +84,7 @@ netsuite_record_class NetSuite::Records::CustomRecord, 123
 
 netsuite_sync: :read
 netsuite_sync: :read_write
-netsuite_sync: :aggressive
+# TODO not after_netsuite_push replacement for aggressive sync
 
 netsuite_sync: :read, frequency: :never
 netsuite_sync: :read, frequency: 5.minutes
