@@ -28,7 +28,7 @@ describe NetSuiteRails::Transformations do
 
     local_date = DateTime.parse("2015-07-24T00:00:00.000-05:00")
     transformed_date = NetSuiteRails::Transformations.date(local_date, :push)
-    expect(transformed_date.to_s).to eq("2015-07-24T22:00:00-07:00")
+    expect(transformed_date.to_s).to eq("2015-07-24T12:00:00-07:00")
   end
 
   it "translates local datetime into NS datetime" do
