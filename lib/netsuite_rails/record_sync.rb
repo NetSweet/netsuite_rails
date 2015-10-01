@@ -84,7 +84,7 @@ module NetSuiteRails
         self.netsuite_record_class == NetSuite::Records::CustomRecord
       end
 
-      # :read, :aggressive (push & update on save), :write_only, :read_write
+      # :read, :write_only, :read_write
       def netsuite_sync(flag = nil, opts = {})
         if !flag.nil?
           self.netsuite_sync_options = opts
@@ -191,7 +191,10 @@ module NetSuiteRails
           end
 
           if association_keys.include?(local_field)
-            field_value = reflection_attributes[local_field].klass.where(netsuite_id: field_value.internal_id).first_or_initialize
+            field_value = reflection_attributes[local_field].
+              klass.
+              where(netsuite_id: field_value.internal_id).
+              first_or_initialize
           elsif is_custom_field
             field_value = NetSuiteRails::RecordSync::PullManager.extract_custom_field_value(field_value)
           else
