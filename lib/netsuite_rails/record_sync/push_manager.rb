@@ -27,13 +27,6 @@ module NetSuiteRails
             push_update(local_record, netsuite_record, opts)
           end
 
-          # :aggressive is for custom fields which are based on input – need pull updated values after
-          # the push to netsuite to retrieve the calculated values
-
-          if local_record.netsuite_sync == :aggressive
-            local_record.netsuite_pull
-          end
-
           local_record.netsuite_execute_callbacks(local_record.class.after_netsuite_push, netsuite_record)
 
           true
@@ -121,7 +114,7 @@ module NetSuiteRails
               next
             end
 
-            # TODO pretty sure this will break if we are dealing with has_many 
+            # TODO pretty sure this will break if we are dealing with has_many
 
             netsuite_field_value = if reflections.has_key?(local_field)
               if (remote_internal_id = local_record.send(local_field).try(:netsuite_id)).present?
@@ -222,7 +215,7 @@ module NetSuiteRails
 
           # changes_attributes does not track serialized attributes, although it does track the storage key
           # if a serialized attribute storage key is dirty assume that all keys in the hash are dirty as well
-          
+
           changed_attributes_keys += serialized_attrs.keys.map do |k|
             local_record.send(k.to_sym).keys.map(&:to_s)
           end.flatten
