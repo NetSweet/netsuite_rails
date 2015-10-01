@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |s|
   s.name          = "netsuite_rails"
-  s.version       = "0.2.2"
+  s.version       = "0.3.0"
   s.authors       = ["Michael Bianco"]
   s.email         = ["mike@cliffsidemedia.com"]
   s.summary       = %q{Write Rails applications that integrate with NetSuite}
@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
   s.test_files    = s.files.grep(%r{^(test|spec|features)/})
   s.require_paths = ["lib"]
 
-  s.add_dependency 'netsuite', '~> 0.4.0'
+  s.add_dependency 'netsuite', '~> 0.4.8'
   s.add_dependency 'rails', '>= 3.2.16'
 
   s.add_development_dependency "bundler", "~> 1.6"
