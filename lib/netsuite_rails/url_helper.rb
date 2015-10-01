@@ -20,7 +20,11 @@ module NetSuiteRails
 
       # https://system.sandbox.netsuite.com/app/common/scripting/scriptrecordlist.nl
       # https://system.sandbox.netsuite.com/app/common/scripting/script.nl
-      
+
+      # dependent record links
+      # https://system.na1.netsuite.com/core/pages/itemchildrecords.nl?id=12413&t=InvtItem%05ProjectCostCategory&rectype=-10
+      # https://system.na1.netsuite.com/app/accounting/transactions/payments.nl?id=91964&label=Customer+Refund&type=custrfnd&alllinks=T
+
       if is_custom_record
         "#{prefix}/common/custom/custrecordentry.nl?id=#{internal_id}&rectype=#{record.class.netsuite_custom_record_type_id}"
       elsif [
@@ -31,6 +35,8 @@ module NetSuiteRails
         "#{prefix}/common/item/item.nl?id=#{internal_id}"
       elsif record_class == NetSuite::Records::Task
         "#{prefix}/crm/calendar/task.nl?id=#{internal_id}"
+      elsif record_class == NetSuite::Records::Roles
+        "#{prefix}/setup/role.nl?id=#{internal_id}"
       elsif [
         NetSuite::Records::Contact,
         NetSuite::Records::Customer,
