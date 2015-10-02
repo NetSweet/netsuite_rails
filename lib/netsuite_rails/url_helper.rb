@@ -30,7 +30,9 @@ module NetSuiteRails
       elsif [
         NetSuite::Records::InventoryItem,
         NetSuite::Records::NonInventorySaleItem,
-        NetSuite::Records::AssemblyItem
+        NetSuite::Records::AssemblyItem,
+        NetSuite::Records::ServiceSaleItem,
+        NetSuite::Records::DiscountItem,
       ].include?(record_class)
         "#{prefix}/common/item/item.nl?id=#{internal_id}"
       elsif record_class == NetSuite::Records::Task
