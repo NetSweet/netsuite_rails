@@ -52,7 +52,8 @@ module NetSuiteRails
         NetSuite::Records::CashSale,
         NetSuite::Records::ItemFulfillment,
         NetSuite::Records::CustomerDeposit,
-        NetSuite::Records::CustomerPayment
+        NetSuite::Records::CustomerPayment,
+        NetSuite::Records::CreditMemo
         ].include?(record_class)
         "#{prefix}/accounting/transactions/transaction.nl?id=#{internal_id}"
       end
