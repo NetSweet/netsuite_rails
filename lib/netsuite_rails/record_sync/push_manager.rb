@@ -47,7 +47,7 @@ module NetSuiteRails
               netsuite_record.internal_id
             end
           else
-            raise "NetSuite: error creating record #{netsuite_record.errors}"
+            raise "NetSuite: error creating #{netsuite_record.class}: #{netsuite_record.errors}"
           end
         end
 
