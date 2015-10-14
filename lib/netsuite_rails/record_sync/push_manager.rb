@@ -8,7 +8,10 @@ module NetSuiteRails
           # TODO check to see if anything is changed before moving forward
           # if changes_keys.blank? && local_record.netsuite_manual_fields
 
-          if opts[:modified_fields]
+          # always include the full netsuite field mapping, regardless of which
+          # fields were modfified locally, when initially creating the netsuite record
+
+          if opts[:modified_fields] && !local_record.new_netsuite_record?
             # if Array, we need to convert info fields hash based on the record definition
             if opts[:modified_fields].is_a?(Array)
               opts[:modified_fields] = all_netsuite_fields(local_record).select { |k,v| opts[:modified_fields].include?(k) }
