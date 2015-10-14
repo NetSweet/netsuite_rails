@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/NetSweet/netsuite_rails.svg?branch=master)](https://travis-ci.org/NetSweet/netsuite_rails)
+[![Circle CI](https://circleci.com/gh/NetSweet/netsuite_rails.svg?style=svg)](https://circleci.com/gh/NetSweet/netsuite_rails)
 
 # NetSuite Rails
 
