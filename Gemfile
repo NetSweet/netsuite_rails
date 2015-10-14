@@ -8,6 +8,8 @@ group :test do
   # gem 'rack-test'
   # gem 'webmock'
 
+  gem 'simplecov', :require => false
+
   gem 'faker'
   gem 'shoulda-matchers'
   gem 'rails', '3.2.16'
@@ -15,7 +17,7 @@ group :test do
 
   gem 'rspec-rails', '~> 3.1'
   gem 'pry-nav'
-  
+
   gem 'rerun'
   gem 'rb-fsevent'
 end
