@@ -1,6 +1,15 @@
 describe NetSuiteRails::RecordSync::PushManager do
   include ExampleModels
 
+  it 'should handle a modified field with a Proc instead of a netsuite field key' do
+    record = StandardRecord.new netsuite_id: 234
+    allow(record).to receive(:new_netsuite_record?).and_return(false)
+
+    ns_record = record.netsuite_record_class.new
+
+    NetSuiteRails::RecordSync::PushManager.push(record, { modified_fields: [ :company ] })
+  end
+
   context "AR" do
     xit "should look at the NS ID of a has_one relationship on the record sync model"
 

@@ -10,7 +10,14 @@ module ExampleModels
           netsuite_record_class NetSuite::Records::Customer
           netsuite_sync :read_write
           netsuite_field_map({
-            :phone => :phone
+            :phone => :phone,
+            :company => Proc.new do |local, netsuite, direction|
+              if direction == :push
+
+              else
+
+              end
+            end
           })
         end
 
