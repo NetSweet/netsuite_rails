@@ -26,8 +26,21 @@ class Item < ActiveRecord::Base
   # local => remote field mapping
   netsuite_field_map({
     :item_number => :item_id,
-    :name => :display_name
+    :name => :display_name,
+    
+    # the corresponding NetSuite field must be manually specified in before_netsuite_push
+    :user => Proc.new do |local_rails_record, netsuite_record, sync_direction|
+    	if direction == :pull
+    	
+    	elsif direction == :push
+    	
+    	end
+    end
   })
+  
+  before_netsuite_push do |netsuite_record|
+    self.netsuite_manual_fields = [:entity]
+  end
 end
 ```
 
