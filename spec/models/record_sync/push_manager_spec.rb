@@ -10,6 +10,17 @@ describe NetSuiteRails::RecordSync::PushManager do
     NetSuiteRails::RecordSync::PushManager.push(record, { modified_fields: [ :company ] })
   end
 
+  it 'should ignore modified fields if the record has not yet been pushed to NetSuite' do
+    record = StandardRecord.new
+
+    expect(NetSuiteRails::RecordSync::PushManager).to receive(:push_add).once
+    expect(NetSuiteRails::RecordSync::PushManager).to receive(:build_netsuite_record).with(instance_of(StandardRecord), hash_including({
+      :modified_fields => hash_including(:phone, :company)
+    }))
+
+    NetSuiteRails::RecordSync::PushManager.push(record, { modified_fields: [ :company ] })
+  end
+
   context "AR" do
     xit "should look at the NS ID of a has_one relationship on the record sync model"
 
