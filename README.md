@@ -179,6 +179,20 @@ Implement `changed_attributes` in your non-AR backed model
 require 'netsuite_rails/spec/spec_helper'
 ```
 
+# Syncing Using Rake Tasks
+
+```
+# clockwork.rb
+every(1.minutes, 'netsuite sync') {
+  # prevent multiple netsuite:sync DJ commands from being added; only one is needed in the queue at a time
+  unless Delayed::Job.where(failed_at: nil, locked_by: nil).detect { |j| j.payload_object.class == DelayedRake && j.payload_object.task == 'netsuite:sync'}
+    Delayed::Job.enqueue DelayedRake.new("netsuite:sync")
+  end
+}
+
+# schedule.rb
+```
+
 ## Author
 
 * Michael Bianco @iloveitaly
