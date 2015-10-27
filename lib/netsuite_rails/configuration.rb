@@ -22,17 +22,19 @@ module NetSuiteRails
 
     def netsuite_push_disabled(flag = nil)
       if flag.nil?
-        attributes[:flag] ||= false
+        attributes[:push_disabled] = false if attributes[:push_disabled].nil?
+        attributes[:push_disabled]
       else
-        attributes[:flag] = flag
+        attributes[:push_disabled] = flag
       end
     end
 
     def netsuite_pull_disabled(flag = nil)
       if flag.nil?
-        attributes[:flag] ||= false
+        attributes[:pull_disabled] = false if attributes[:pull_disabled].nil?
+        attributes[:pull_disabled]
       else
-        attributes[:flag] = flag
+        attributes[:pull_disabled] = flag
       end
     end
 
