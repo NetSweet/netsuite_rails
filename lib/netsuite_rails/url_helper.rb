@@ -58,6 +58,8 @@ module NetSuiteRails
         NetSuite::Records::CreditMemo
         ].include?(record_class)
         "#{prefix}/accounting/transactions/transaction.nl?id=#{internal_id}"
+      elsif NetSuite::Records::Account == record_class
+        "#{prefix}/accounting/account/account.nl?id=#{internal_id}"
       end
     end
 
