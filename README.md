@@ -1,4 +1,5 @@
 [![Circle CI](https://circleci.com/gh/NetSweet/netsuite_rails.svg?style=svg)](https://circleci.com/gh/NetSweet/netsuite_rails)
+[![Slack Status](https://opensuite-slackin.herokuapp.com/badge.svg)](http://opensuite-slackin.herokuapp.com)
 
 # NetSuite Rails
 
