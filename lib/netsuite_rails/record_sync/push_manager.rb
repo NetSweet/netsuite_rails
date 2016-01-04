@@ -36,10 +36,11 @@ module NetSuiteRails
         end
 
         def push_add(local_record, netsuite_record, opts = {})
-          Rails.logger.info "NetSuite: Add #{netsuite_record.class}"
-
           # push_method is either :add or :upsert
           if netsuite_record.send(opts[:push_method] || :add)
+            Rails.logger.info "NetSuite: action=#{opts[:push_method]}, local_record=#{local_record.class}[#{local_record.id}]" +
+                              "netsuite_record_type=#{netsuite_record.class}, netsuite_record_id=#{netsuite_record.internal_id}"
+
             if is_active_record_model?(local_record)
               # update_column to avoid triggering another save
               local_record.update_column(:netsuite_id, netsuite_record.internal_id)
@@ -47,7 +48,7 @@ module NetSuiteRails
               netsuite_record.internal_id
             end
           else
-            raise "NetSuite: error creating #{netsuite_record.class}: #{netsuite_record.errors}"
+            raise "NetSuite: error. action=#{opts[:push_method]}, netsuite_record_type=#{netsuite_record.class}, errors=#{netsuite_record.errors}"
           end
         end
 
