@@ -32,4 +32,13 @@ RSpec.configure do |config|
   config.mock_with :rspec do |mocks|
     mocks.verify_partial_doubles = true
   end
+
+  config.before do
+    NetSuiteRails.configure do
+      reset!
+      netsuite_sync_mode :sync
+    end
+
+    NetSuite::Configuration.reset!
+  end
 end
