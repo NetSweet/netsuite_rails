@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
   s.test_files    = s.files.grep(%r{^(test|spec|features)/})
   s.require_paths = ["lib"]
 
-  s.add_dependency 'netsuite', '> 0.4.8'
+  s.add_dependency 'netsuite', '> 0.5.2'
   s.add_dependency 'rails', '>= 3.2.16'
 
   s.add_development_dependency "bundler", "~> 1.6"
