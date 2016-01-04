@@ -4,7 +4,8 @@ module NetSuiteRails
     # TODO create a xxx_netsuite_url helper generator
 
     def self.netsuite_url(record = self)
-      prefix = "https://system#{".sandbox" if NetSuite::Configuration.sandbox}.netsuite.com/app"
+      domain = NetSuite::Configuration.wsdl_domain.sub('webservices.', 'system.')
+      prefix = "https://#{domain}/app"
 
       if record.class.to_s.start_with?('NetSuite::Records')
         record_class = record.class
@@ -25,8 +26,8 @@ module NetSuiteRails
       # https://system.na1.netsuite.com/core/pages/itemchildrecords.nl?id=12413&t=InvtItem%05ProjectCostCategory&rectype=-10
       # https://system.na1.netsuite.com/app/accounting/transactions/payments.nl?id=91964&label=Customer+Refund&type=custrfnd&alllinks=T
 
-      if is_custom_record
-        "#{prefix}/common/custom/custrecordentry.nl?id=#{internal_id}&rectype=#{record.class.netsuite_custom_record_type_id}"
+      suffix = if is_custom_record
+        "/common/custom/custrecordentry.nl?id=#{internal_id}&rectype=#{record.class.netsuite_custom_record_type_id}"
       elsif [
         NetSuite::Records::InventoryItem,
         NetSuite::Records::NonInventorySaleItem,
@@ -34,11 +35,11 @@ module NetSuiteRails
         NetSuite::Records::ServiceSaleItem,
         NetSuite::Records::DiscountItem,
       ].include?(record_class)
-        "#{prefix}/common/item/item.nl?id=#{internal_id}"
+        "/common/item/item.nl?id=#{internal_id}"
       elsif record_class == NetSuite::Records::Task
-        "#{prefix}/crm/calendar/task.nl?id=#{internal_id}"
+        "/crm/calendar/task.nl?id=#{internal_id}"
       elsif record_class == NetSuite::Records::Roles
-        "#{prefix}/setup/role.nl?id=#{internal_id}"
+        "/setup/role.nl?id=#{internal_id}"
       elsif [
         NetSuite::Records::Contact,
         NetSuite::Records::Customer,
@@ -46,7 +47,7 @@ module NetSuiteRails
         NetSuite::Records::Partner,
         NetSuite::Records::Employee
       ].include?(record_class)
-        "#{prefix}/common/entity/entity.nl?id=#{internal_id}"
+        "/common/entity/entity.nl?id=#{internal_id}"
       elsif [
         NetSuite::Records::SalesOrder,
         NetSuite::Records::Invoice,
@@ -55,12 +56,17 @@ module NetSuiteRails
         NetSuite::Records::ItemFulfillment,
         NetSuite::Records::CustomerDeposit,
         NetSuite::Records::CustomerPayment,
-        NetSuite::Records::CreditMemo
+        NetSuite::Records::CreditMemo,
+        NetSuite::Records::Deposit
         ].include?(record_class)
-        "#{prefix}/accounting/transactions/transaction.nl?id=#{internal_id}"
+        "/accounting/transactions/transaction.nl?id=#{internal_id}"
       elsif NetSuite::Records::Account == record_class
-        "#{prefix}/accounting/account/account.nl?id=#{internal_id}"
+        "/accounting/account/account.nl?id=#{internal_id}"
+      else
+        # TODO unsupported record type error?
       end
+
+      prefix + suffix
     end
 
   end
