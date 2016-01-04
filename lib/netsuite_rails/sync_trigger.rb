@@ -9,6 +9,7 @@ module NetSuiteRails
 
     def attach(klass)
       # don't attach to non-AR backed models
+      # it is the user's responsibility to trigger `Model#netsuite_push` when ActiveRecord isn't used
       return unless klass.ancestors.include?(ActiveRecord::Base)
 
       if klass.include?(SubListSync)
@@ -57,21 +58,25 @@ module NetSuiteRails
       record_trigger_action(local, :netsuite_pull)
     end
 
-    def record_push_trigger(netsuite_record_rep)
+    def record_push_trigger(local)
       # don't update when fields are updated because of a netsuite_pull
-      return if netsuite_record_rep.netsuite_pulling?
+      if local.netsuite_pulling?
+        Rails.logger.info "NetSuite: Push Stopped. Record is pulling. " +
+                          "local_record=#{local.class}, local_record_id=#{local.id}"
+        return
+      end
 
       return if NetSuiteRails::Configuration.netsuite_push_disabled
 
       # don't update if a read only record
-      return if netsuite_record_rep.netsuite_sync == :read
+      return if local.netsuite_sync == :read
 
-      sync_options = netsuite_record_rep.netsuite_sync_options
+      sync_options = local.netsuite_sync_options
 
       # :if option is a block that returns a boolean
-      return if sync_options.has_key?(:if) && !netsuite_record_rep.instance_exec(&sync_options[:if])
+      return if sync_options.has_key?(:if) && !local.instance_exec(&sync_options[:if])
 
-      record_trigger_action(netsuite_record_rep, :netsuite_push)
+      record_trigger_action(local, :netsuite_push)
     end
 
     def record_trigger_action(local, action)
@@ -86,7 +91,7 @@ module NetSuiteRails
       end
 
       # TODO need to pass off the credentials to the NS push command
-      
+
       # You can force sync mode in different envoirnments with the global configuration variables
 
       if sync_options[:mode] == :sync || NetSuiteRails::Configuration.netsuite_sync_mode == :sync
@@ -111,7 +116,7 @@ module NetSuiteRails
       # so there is no gaurentee that it isn't being pulled by checking parent.netsuite_pulling?
 
       parent = sublist_item_rep.send(sublist_item_rep.class.netsuite_sublist_parent)
-      
+
       if parent.class.include?(RecordSync)
         record_push_trigger(parent)
       end
