@@ -28,17 +28,17 @@ class Item < ActiveRecord::Base
   netsuite_field_map({
     :item_number => :item_id,
     :name => :display_name,
-    
+
     # the corresponding NetSuite field must be manually specified in before_netsuite_push
     :user => Proc.new do |local_rails_record, netsuite_record, sync_direction|
     	if direction == :pull
-    	
+
     	elsif direction == :push
-    	
+
     	end
     end
   })
-  
+
   before_netsuite_push do |netsuite_record|
     self.netsuite_manual_fields = [:entity]
   end
@@ -48,8 +48,16 @@ end
 Your ruby model:
 
 * Needs to have a `netsuite_id` & `netsuite_id=` method
-* Does not need to be an `ActiveRecord` model. If you don't use ActiveRecord you have to implement: TODO
+* Does not need to be an `ActiveRecord` model. If you don't use ActiveRecord it is your responsibility
+  to trigger `Model#netsuite_push`
 
+## Using Upsert
+
+TODO generating external ID tag
+
+TODO configuring upsert
+
+TODO add vs upsert consideration
 
 ## Installation
 
@@ -182,7 +190,7 @@ require 'netsuite_rails/spec/spec_helper'
 
 # Syncing Using Rake Tasks
 
-```
+```ruby
 # clockwork.rb
 every(1.minutes, 'netsuite sync') {
   # prevent multiple netsuite:sync DJ commands from being added; only one is needed in the queue at a time
@@ -192,6 +200,10 @@ every(1.minutes, 'netsuite sync') {
 }
 
 # schedule.rb
+# DelayedRake: https://github.com/collectiveidea/delayed_job/wiki/Rake-Task-as-a-Delayed-Job
+every 2.minutes do
+  runner 'Delayed::Job.enqueue(DelayedRake.new("netsuite:sync"),priority:1,run_at: Time.now);'
+end
 ```
 
 ## Author
