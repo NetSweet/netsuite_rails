@@ -30,9 +30,10 @@ describe NetSuiteRails::RecordSync::PollManager do
   end
 
   it "should sync only available local records" do
-    NetSuiteRails::Configuration.netsuite_push_disabled true
+    # disabling NS pull since this is treated as a record import (NS ID = exists, new_record? == true)
+    NetSuiteRails::Configuration.netsuite_pull_disabled true
     StandardRecord.create! netsuite_id: 123
-    NetSuiteRails::Configuration.netsuite_push_disabled false
+    NetSuiteRails::Configuration.netsuite_pull_disabled false
 
     allow(NetSuite::Records::Customer).to receive(:get_list).and_return([OpenStruct.new(internal_id: 123)])
     allow(NetSuiteRails::RecordSync::PollManager).to receive(:process_search_result_item)
