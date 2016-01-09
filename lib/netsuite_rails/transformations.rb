@@ -37,7 +37,17 @@ module NetSuiteRails
       # NS will throw an error if whitespace bumpers the email string
       def email(email, direction = :push)
         if direction == :push
-          email.strip
+          # any whitespace will cause netsuite to throw a fatal error
+          email = email.gsub(' ', '')
+
+          # TODO consider throwing an exception instead of returning nil?
+          # netsuite will throw a fatal error if a valid email address is not sent
+          # http://stackoverflow.com/questions/742451/what-is-the-simplest-regular-expression-to-validate-emails-to-not-accept-them-bl
+          unless /.+@.+\..+/ =~ cleaned_email
+            return nil
+          end
+
+          nil
         else
           email
         end
