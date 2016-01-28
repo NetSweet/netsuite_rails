@@ -36,11 +36,22 @@ class Item < ActiveRecord::Base
     	elsif direction == :push
 
     	end
-    end
+    end,
+    
+    :custom_field_list => {
+    	:a_local_field => :custrecord_remote_field
+    	:a_special_local_field => Proc.new do |local, ns_record, direction|
+    		if direction == :push
+    		  # if proc is used with a field mapping, the field must be specified in `netsuite_manual_fields`
+    		  ns_record.custom_field_list.custentity_special_long = 1
+            ns_record.custom_field_list.custentity_special_long.type = 'platformCore:LongCustomFieldRef'
+    		end
+    	end
+    }
   })
 
   before_netsuite_push do |netsuite_record|
-    self.netsuite_manual_fields = [:entity]
+    self.netsuite_manual_fields = [ :entity, :custom_field_list ]
   end
 end
 ```
@@ -94,7 +105,7 @@ NetSuiteRails::Configuration.netsuite_instance_time_zone_offset(-6)
 
 ### Changing WebService User's TimeZone Preferences
 
-It might take a couple hours for time zone changes to take effect. From my experience, either the time zone changes have some delay associated with them or the time zone implementation is extremely buggy.
+It might take a couple hours for time zone changes to take effect. [From my experience](http://mikebian.co/netsuite-suitetalk-user-role-edits-are-delayed/), either the time zone changes have some delay associated with them or the time zone implementation is extremely buggy.
 
 ## Usage
 
