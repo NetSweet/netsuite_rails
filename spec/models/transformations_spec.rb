@@ -49,4 +49,14 @@ describe NetSuiteRails::Transformations do
     transformed_netsuite_time = NetSuiteRails::Transformations.datetime(netsuite_time, :pull)
     expect(transformed_netsuite_time.to_s).to eq('1970-01-01T05:00:00-05:00')
   end
+
+  it 'transforms a invalid email' do
+    netsuite_email = ' hey@example.com. '
+    transformed_netsuite_email = NetSuiteRails::Transformations.email(netsuite_email, :push)
+    expect(transformed_netsuite_email.to_s).to eq('hey@example.com')
+
+    netsuite_email = ' example+second@example.family. '
+    transformed_netsuite_email = NetSuiteRails::Transformations.email(netsuite_email, :push)
+    expect(transformed_netsuite_email.to_s).to eq('example+second@example.family')
+  end
 end
