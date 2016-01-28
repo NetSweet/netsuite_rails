@@ -43,7 +43,7 @@ module NetSuiteRails
           # TODO consider throwing an exception instead of returning nil?
           # netsuite will throw a fatal error if a valid email address is not sent
           # http://stackoverflow.com/questions/742451/what-is-the-simplest-regular-expression-to-validate-emails-to-not-accept-them-bl
-          unless /.+@.+\..+/ =~ cleaned_email
+          unless /.+@.+\..+/ =~ email
             return nil
           end
 
