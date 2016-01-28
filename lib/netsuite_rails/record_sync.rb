@@ -96,7 +96,11 @@ module NetSuiteRails
     end
 
     module InstanceMethods
-      attr_accessor :netsuite_manual_fields
+      attr_writer :netsuite_manual_fields
+
+      def netsuite_manual_fields
+        @netsuite_manual_fields ||= []
+      end
 
       # these methods are here for easy model override
 
