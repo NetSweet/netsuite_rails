@@ -57,8 +57,11 @@ module NetSuiteRails
           # NS could have logic which could change field functionality depending on
           # input data; it's safest to limit the number of field changes pushed to NS
 
-          # filter out fields that map to procs: they don't indicate which netsuite field
-          # the local rails field maps so, so the user must specify this manually in `netsuite_manual_fields`
+          # exclude fields that map to procs: they don't indicate which netsuite field
+          # the local rails field maps to, so the user must specify this manually in `netsuite_manual_fields`
+
+          # TODO add option for model to mark `custom_field_list = true` if custom field mapping to a
+          #      proc is detected. This is helpful for users mapping a local field to a custom field
 
           custom_field_list = local_record.netsuite_field_map[:custom_field_list] || {}
           custom_field_list = custom_field_list.select { |local_field, netsuite_field| !netsuite_field.is_a?(Proc) }
