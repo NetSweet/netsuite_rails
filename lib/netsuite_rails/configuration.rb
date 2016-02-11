@@ -14,7 +14,7 @@ module NetSuiteRails
 
     def netsuite_sync_mode(mode = nil)
       if mode.nil?
-        attributes[:sync_mode] ||= :none
+        attributes[:sync_mode] ||= :async
       else
         attributes[:sync_mode] = mode
       end
