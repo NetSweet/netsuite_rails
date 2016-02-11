@@ -140,8 +140,12 @@ module NetSuiteRails
 
       # TODO need to support the opts hash
       def netsuite_pull(opts = {})
-        # TODO need to support the opts hash
         netsuite_extract_from_record(netsuite_pull_record)
+
+        if self.netsuite_async_jobs?
+          # without callbacks?
+          self.save
+        end
       end
 
       def netsuite_pull_record
