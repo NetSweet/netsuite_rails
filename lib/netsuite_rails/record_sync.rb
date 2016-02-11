@@ -134,6 +134,11 @@ module NetSuiteRails
         @netsuite_pulled ||= false
       end
 
+      def netsuite_async_jobs?
+        self.netsuite_sync_options[:sync_mode] == :async || (self.netsuite_sync_options[:sync_mode].blank? && NetSuiteRails::Configuration.netsuite_sync_mode == :async)
+      end
+
+      # TODO need to support the opts hash
       def netsuite_pull(opts = {})
         # TODO need to support the opts hash
         netsuite_extract_from_record(netsuite_pull_record)
