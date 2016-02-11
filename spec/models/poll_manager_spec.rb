@@ -43,4 +43,12 @@ describe NetSuiteRails::RecordSync::PollManager do
     expect(NetSuite::Records::Customer).to have_received(:get_list)
   end
 
+  it 'runs netsuite_pull on a newly created record with a netsuite_id defined' do
+    record = StandardRecord.new netsuite_id: 123
+    allow(record).to receive(:netsuite_pull)
+
+    record.save!
+
+    expect(record).to have_received(:netsuite_pull)
+  end
 end
