@@ -21,20 +21,26 @@ module NetSuiteRails
         klass.before_save do
           @netsuite_sync_record_import = self.new_record? && self.netsuite_id.present?
 
-          # if false record will not save
-          true
-        end
-
-        klass.after_save do
-          # need to implement this conditional on the save hook level
-          # because the coordination class doesn't know about model persistence state
-
           if @netsuite_sync_record_import
             # pull the record down if it has't been pulled yet
             # this is useful when this is triggered by a save on a parent record which has this
             # record as a related record
 
-            unless self.netsuite_pulled?
+            if !self.netsuite_pulled? && !self.netsuite_async_jobs?
+              SyncTrigger.record_pull_trigger(self)
+            end
+          end
+
+          # if false record will not save
+          true
+        end
+
+        klass.after_save do
+          # this conditional is implemented as a save hook
+          # because the coordination class doesn't know about model persistence state
+
+          if @netsuite_sync_record_import
+            if !self.netsuite_pulled? && self.netsuite_async_jobs?
               SyncTrigger.record_pull_trigger(self)
             end
           else
@@ -94,12 +100,12 @@ module NetSuiteRails
 
       # You can force sync mode in different envoirnments with the global configuration variables
 
-      if sync_options[:mode] == :sync || NetSuiteRails::Configuration.netsuite_sync_mode == :sync
+      if !local.netsuite_async_jobs?
         local.send(action, action_options)
       else
         action_options[:modified_fields] = NetSuiteRails::RecordSync::PushManager.modified_local_fields(local).keys
 
-        # TODO support the rails4 DJ implementation
+        # TODO support ActiveJob
 
         if local.respond_to?(:delay)
           local.delay.send(action, action_options)
