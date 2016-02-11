@@ -3,9 +3,9 @@
 
 # NetSuite Rails
 
-**Note:** Documentation is horrible... look at the code for details.
+**<span style="color: red">Note:</span>** Documentation is horrible: PRs welcome. Look at the code for details.
 
-Build Ruby on Rails applications that effortlessly sync to NetSuite. Here's an example:
+Build Ruby on Rails applications that sync ActiveRecord (ActiveModel and plain old ruby objects too) in real-time to NetSuite. Here's an example:
 
 ```ruby
 class Item < ActiveRecord::Base
@@ -19,9 +19,14 @@ class Item < ActiveRecord::Base
     frequency: 1.day,
     # it's possible to base syncing off of a saved search. Be sure that "Internal ID" is one of your search result columns
     saved_search_id: 123,
-    # limit pushing/pulling to/from NetSuite based on custom conditionals
-    if: -> { true },
-    pull_if: -> { true }
+    # limit pushing to NetSuite based on conditional
+    if: -> { self.a_condition? },
+    # limit pulling from NetSuite based on conditional. This is only
+    # considered when handling a single pull
+    pull_if: -> { self.another_condition? },
+
+    # accepted values are :async and :sync. Default is :async
+    mode: :sync
 
 
   # local => remote field mapping
@@ -37,17 +42,23 @@ class Item < ActiveRecord::Base
 
     	end
     end,
-    
+
     :custom_field_list => {
     	:a_local_field => :custrecord_remote_field
     	:a_special_local_field => Proc.new do |local, ns_record, direction|
     		if direction == :push
     		  # if proc is used with a field mapping, the field must be specified in `netsuite_manual_fields`
     		  ns_record.custom_field_list.custentity_special_long = 1
-            ns_record.custom_field_list.custentity_special_long.type = 'platformCore:LongCustomFieldRef'
+          ns_record.custom_field_list.custentity_special_long.type = 'platformCore:LongCustomFieldRef'
     		end
     	end
     }
+  })
+
+  # sanitizes input from rails to ensure NS doesn't throw a fatal error
+  netsuite_field_hints({
+    :phone => :phone,
+    :email => :email
   })
 
   before_netsuite_push do |netsuite_record|
@@ -58,9 +69,14 @@ end
 
 Your ruby model:
 
-* Needs to have a `netsuite_id` & `netsuite_id=` method
+* Needs to have a `netsuite_id` and `netsuite_id=` method
 * Does not need to be an `ActiveRecord` model. If you don't use ActiveRecord it is your responsibility
-  to trigger `Model#netsuite_push`
+  to trigger `Model#netsuite_push`.
+
+Notes:
+
+* If `sync_mode == :async` `model.save` will be run if a record is created referencing an existing NetSuite object: `model.create! netsuite_id: 123`
+* If you are using `update`, a `update` call will not be run if no changed fields are detected. If you are manually using fields specify them with `netsuite_manual_fields`
 
 ## Using Upsert
 
