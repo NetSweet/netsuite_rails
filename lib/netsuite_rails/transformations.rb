@@ -17,6 +17,8 @@ module NetSuiteRails
 
       def phone(phone, direction = :push)
         if direction == :push
+          return nil if phone.nil?
+
           formatted_phone = phone.
             strip.
             gsub(/ext(ension)?/, 'x').
