@@ -215,6 +215,18 @@ Implement `changed_attributes` in your non-AR backed model
 require 'netsuite_rails/spec/spec_helper'
 ```
 
+Using the helpers:
+
+```ruby
+it 'does something' do
+  # setup...
+
+  # action
+
+  ns_customer = get_last_netsuite_object(NetSuite::Records::Customer)
+end
+```
+
 # Syncing Using Rake Tasks
 
 ```ruby
