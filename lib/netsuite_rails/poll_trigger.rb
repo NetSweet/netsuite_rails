@@ -43,7 +43,7 @@ module NetSuiteRails
             last_poll_date = last_class_poll.value
             last_poll_date = DateTime.parse(last_poll_date) unless last_poll_date.is_a?(DateTime)
 
-            if DateTime.now.to_i - last_poll_date.to_i > sync_frequency
+            if poll_execution_time.to_i - last_poll_date.to_i > sync_frequency
               Rails.logger.info "NetSuite: #{klass} is due to be synced, last checked #{last_poll_date}"
               klass.netsuite_poll({ last_poll: last_poll_date }.merge(opts))
             else
@@ -71,7 +71,7 @@ module NetSuiteRails
           NetSuiteRails::RecordSync::PollManager.update_local_records(klass, opts)
         end
       end
-      
+
     end
 
   end
