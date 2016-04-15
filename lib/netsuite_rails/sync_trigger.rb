@@ -10,7 +10,7 @@ module NetSuiteRails
     def attach(klass)
       # don't attach to non-AR backed models
       # it is the user's responsibility to trigger `Model#netsuite_push` when ActiveRecord isn't used
-      return unless klass.ancestors.include?(ActiveRecord::Base)
+      return if !defined?(::ActiveRecord) || !klass.ancestors.include?(::ActiveRecord::Base)
 
       if klass.include?(SubListSync)
         klass.after_save { SyncTrigger.sublist_trigger(self) }

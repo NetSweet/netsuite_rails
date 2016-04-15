@@ -1,7 +1,7 @@
 require 'netsuite'
 
 require 'netsuite_rails/configuration'
-require 'netsuite_rails/poll_timestamp'
+require 'netsuite_rails/poll_timestamp' if defined?(::ActiveRecord)
 require 'netsuite_rails/transformations'
 require 'netsuite_rails/url_helper'
 
@@ -22,7 +22,7 @@ require 'netsuite_rails/list_sync/poll_manager'
 module NetSuiteRails
 
   def self.rails4?
-    Rails::VERSION::MAJOR >= 4
+    ::Rails::VERSION::MAJOR >= 4
   end
 
   def self.configure_from_env(&block)
@@ -36,7 +36,7 @@ module NetSuiteRails
         netsuite_pull_disabled true
         netsuite_push_disabled true
       end
-      
+
       polling_page_size if ENV['NETSUITE_POLLING_PAGE_SIZE'].present?
     end
 
