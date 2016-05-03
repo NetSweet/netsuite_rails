@@ -62,6 +62,8 @@ module NetSuiteRails
         "/accounting/transactions/transaction.nl?id=#{internal_id}"
       elsif NetSuite::Records::Account == record_class
         "/accounting/account/account.nl?id=#{internal_id}"
+      elsif NetSuite::Records::Subsidiary == record_class
+        "/common/otherlists/subsidiarytype.nl?id=#{internal_id}"
       else
         # TODO unsupported record type error?
       end
