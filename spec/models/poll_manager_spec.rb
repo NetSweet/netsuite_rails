@@ -22,7 +22,8 @@ describe NetSuiteRails::RecordSync::PollManager do
   end
 
   it "should poll list sync objects" do
-  	allow(NetSuite::Records::CustomList).to receive(:get).and_return(OpenStruct.new(custom_value_list: OpenStruct.new(custom_value: [])))
+  	allow(NetSuite::Records::CustomList).to receive(:get)
+      .and_return(OpenStruct.new(custom_value_list: OpenStruct.new(custom_value: [])))
 
   	StandardList.netsuite_poll(import_all: true)
 
@@ -50,5 +51,71 @@ describe NetSuiteRails::RecordSync::PollManager do
     record.save!
 
     expect(record).to have_received(:netsuite_pull)
+  end
+
+  describe 'custom search criteria' do
+    let(:basic_search_field) do
+      {
+        field: 'type',
+        operator: 'anyOf',
+        value: [ '_itemFulfillment' ]
+      }
+    end
+
+    let(:advanced_search_criteria) do
+      {
+        createdFromJoin: [
+          {
+            field: 'type',
+            operator: 'anyOf',
+            value: [ '_transferOrder' ]
+          }
+        ]
+      }
+    end
+
+    it 'should merge basic search criteria' do
+      expect(NetSuite::Records::Customer).to receive(:search)
+        .with(hash_including(
+          criteria: hash_including(
+            basic: array_including(
+              basic_search_field
+            )
+          )
+        ))
+        .and_return(OpenStruct.new(results: []))
+
+      NetSuiteRails::RecordSync::PollManager.poll(StandardRecord,
+        criteria: [ basic_search_field ]
+      )
+    end
+
+    it 'merges advanced and basic criteria' do
+      expect(NetSuite::Records::Customer).to receive(:search)
+        .with(hash_including(
+          criteria: {
+            basic: array_including(
+              basic_search_field
+            )
+          }.merge(advanced_search_criteria)
+        ))
+        .and_return(OpenStruct.new(results: []))
+
+      NetSuiteRails::RecordSync::PollManager.poll(StandardRecord,
+        criteria: {
+          basic: [ basic_search_field ]
+        }.merge(advanced_search_criteria)
+      )
+    end
+
+    it 'should merge join/advanced criteria' do
+      expect(NetSuite::Records::Customer).to receive(:search)
+        .with(hash_including(criteria: hash_including(advanced_search_criteria)))
+        .and_return(OpenStruct.new(results: []))
+
+      NetSuiteRails::RecordSync::PollManager.poll(StandardRecord,
+        criteria: advanced_search_criteria
+      )
+    end
   end
 end
