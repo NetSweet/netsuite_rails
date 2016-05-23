@@ -11,7 +11,4 @@ group :test do
 
   gem 'rspec-rails', '~> 3.4.2'
   gem 'pry-nav'
-
-  gem 'rerun'
-  gem 'rb-fsevent'
 end
