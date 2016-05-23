@@ -60,7 +60,7 @@ module NetSuiteRails
         search_criteria = {
           criteria: {
             basic: poll_basic_criteria(klass, opts)
-          }
+          }.merge(poll_join_criteria(klass, opts))
         }
 
         if opts[:saved_search_id]
@@ -85,7 +85,7 @@ module NetSuiteRails
         }.merge(opts)
 
         # allow custom criteria to be passed directly to the sync call
-        criteria = opts[:criteria] || []
+        criteria = extract_basic_search_criteria(opts[:criteria])
 
         # allow custom criteria from the model level
         criteria += klass.netsuite_sync_options[:criteria] || []
@@ -110,6 +110,35 @@ module NetSuiteRails
         end
 
         criteria
+      end
+
+      def poll_join_criteria(klass, opts)
+        extract_advanced_search_criteria(opts[:criteria])
+      end
+
+      def extract_advanced_search_criteria(criteria_option)
+        if criteria_option.is_a?(Hash)
+          criteria_option = criteria_option.dup
+          criteria_option.delete(:basic)
+
+          criteria_option
+        elsif criteria_option.is_a?(Array) || criteria_option.nil?
+          {}
+        else
+          # TODO unhandled criteria type
+        end
+      end
+
+      def extract_basic_search_criteria(criteria_option)
+        # TODO use `kind_of?` instead?
+
+        if criteria_option.is_a?(Hash)
+          criteria_option[:basic] || []
+        elsif criteria_option.is_a?(Array)
+          criteria_option
+        else
+          # TODO unhandled criteria class
+        end
       end
 
       def process_search_results(klass, opts, search)
