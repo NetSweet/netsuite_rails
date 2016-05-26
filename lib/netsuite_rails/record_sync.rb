@@ -18,6 +18,8 @@ module NetSuiteRails
 
         cattr_accessor :netsuite_custom_record_type_id
         cattr_accessor :netsuite_sync_options
+
+        self.netsuite_sync_options = {}
       end
 
       klass.send(:extend, ClassMethods)
