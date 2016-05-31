@@ -79,6 +79,7 @@ module NetSuiteRails
 
       sync_options = local.netsuite_sync_options
 
+      # TODO should migrate to push_if for better self-documentation
       # :if option is a block that returns a boolean
       return if sync_options.has_key?(:if) && !local.instance_exec(&sync_options[:if])
 
