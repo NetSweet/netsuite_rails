@@ -252,7 +252,7 @@ module NetSuiteRails
         end
 
         def is_active_record_model?(local_record)
-          local_record.class.ancestors.include?(ActiveRecord::Base)
+          defined?(::ActiveRecord::Base) && local_record.class.ancestors.include?(ActiveRecord::Base)
         end
 
       end
