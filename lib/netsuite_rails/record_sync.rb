@@ -200,7 +200,7 @@ module NetSuiteRails
             netsuite_record.send(netsuite_field)
           end
 
-          if field_value.blank?
+          if field_value.nil?
             # TODO possibly nil out the local value?
             next
           end
@@ -218,7 +218,7 @@ module NetSuiteRails
 
           # TODO should we just check for nil? vs present?
 
-          if field_hints.has_key?(local_field) && field_value.present?
+          if field_hints.has_key?(local_field) && !field_value.nil?
             field_value = NetSuiteRails::Transformations.transform(field_hints[local_field], field_value, :pull)
           end
 
