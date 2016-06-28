@@ -30,6 +30,11 @@ module NetSuiteRails
           # eliminate the extension if the number is still too long
           formatted_phone.gsub!(/x.*$/, '') if formatted_phone.size > 22
 
+          # phone numbers less than 7 digits throw a fatal error
+          if formatted_phone.size < 7
+            return nil
+          end
+
           formatted_phone
         else
           phone
