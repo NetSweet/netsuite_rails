@@ -13,6 +13,12 @@ describe NetSuiteRails::Transformations do
     NetSuiteRails::Configuration.netsuite_instance_time_zone_offset -6
   end
 
+  it 'nils out short phone numbers' do
+    short_phone_number = '  301908  '
+
+    expect(NetSuiteRails::Transformations.phone(short_phone_number)).to be_nil
+  end
+
   it 'handles very long phone numbers' do
     long_phone_number = '+1 (549)-880-4834 ext. 51077'
 
