@@ -129,7 +129,7 @@ module NetSuiteRails
 
             # TODO pretty sure this will break if we are dealing with has_many
 
-            netsuite_field_value = if reflections.has_key?(local_field)
+            netsuite_field_value = if reflections.has_key?(reflections.keys.first.class == String ? local_field.to_s : local_field)
               if (remote_internal_id = local_record.send(local_field).try(:netsuite_id)).present?
                 { internal_id: remote_internal_id }
               else
