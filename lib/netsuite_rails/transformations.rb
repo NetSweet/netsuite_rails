@@ -19,6 +19,11 @@ module NetSuiteRails
         number.to_i
       end
 
+      # TODO consider adding precision?
+      def float(number, direction = :push)
+        number.to_f
+      end
+
       def phone(phone, direction = :push)
         if direction == :push
           return nil if phone.nil?
