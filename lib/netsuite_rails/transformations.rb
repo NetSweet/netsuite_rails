@@ -15,6 +15,10 @@ module NetSuiteRails
         end
       end
 
+      def integer(number, direction = :push)
+        number.to_i
+      end
+
       def phone(phone, direction = :push)
         if direction == :push
           return nil if phone.nil?
