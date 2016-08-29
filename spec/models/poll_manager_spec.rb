@@ -7,13 +7,65 @@ describe NetSuiteRails::RecordSync::PollManager do
 
   let(:empty_search_results) { OpenStruct.new(results: [ OpenStruct.new(internal_id: 0) ]) }
 
-  it "should poll record sync objects" do
-  	allow(NetSuite::Records::Customer).to receive(:search).and_return(empty_search_results)
+  describe 'polling ranges' do
+    let(:updated_after) { DateTime.new(2016, 01, 01) }
+    let(:updated_before) { DateTime.new(2016, 01, 02) }
 
-  	StandardRecord.netsuite_poll(import_all: true)
+    it 'does not restrict poll by date if import_all is specified' do
+      expect(NetSuite::Records::Customer).to receive(:search)
+        .with(hash_including(
+          criteria: hash_including(
+            basic: []
+          )
+        ))
+        .and_return(empty_search_results)
 
-  	expect(NetSuite::Records::Customer).to have_received(:search)
+      StandardRecord.netsuite_poll(import_all: true)
+    end
+
+    it 'restricts polling within a range' do
+      expect(NetSuite::Records::Customer).to receive(:search)
+        .with(hash_including(
+          criteria: hash_including(
+            basic: array_including(
+              {
+                field: 'lastModifiedDate',
+                operator: 'within',
+                value: [
+                  updated_after,
+                  updated_before
+                ]
+              }
+            )
+          )
+        ))
+        .and_return(empty_search_results)
+
+      StandardRecord.netsuite_poll(
+        last_poll: updated_after,
+        updated_before: updated_before
+      )
+    end
+
+    it 'restricts polling after a date' do
+      expect(NetSuite::Records::Customer).to receive(:search)
+        .with(hash_including(
+          criteria: hash_including(
+            basic: array_including(
+              {
+                field: 'lastModifiedDate',
+                operator: 'after',
+                value: updated_after
+              }
+            )
+          )
+        ))
+        .and_return(empty_search_results)
+
+      StandardRecord.netsuite_poll(last_poll: updated_after)
+    end
   end
+
 
   skip "should poll and then get_list on saved search" do
     # TODO SS enabled record
