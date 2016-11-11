@@ -64,8 +64,25 @@ describe NetSuiteRails::RecordSync::PollManager do
 
       StandardRecord.netsuite_poll(last_poll: updated_after)
     end
-  end
 
+    it 'allows the polling field to be customized' do
+      expect(NetSuite::Records::Customer).to receive(:search)
+        .with(hash_including(
+          criteria: hash_including(
+            basic: array_including(
+              {
+                field: 'lastQuantityAvailableChange',
+                operator: 'after',
+                value: updated_after
+              }
+            )
+          )
+        ))
+        .and_return(empty_search_results)
+
+      StandardRecord.netsuite_poll(last_poll: updated_after, netsuite_poll_field: 'lastQuantityAvailableChange')
+    end
+  end
 
   skip "should poll and then get_list on saved search" do
     # TODO SS enabled record
