@@ -102,11 +102,11 @@ module NetSuiteRails
 
         unless opts[:import_all]
           # CustomRecordSearchBasic uses lastModified instead of the standard lastModifiedDate
-          last_modified_field = (klass.netsuite_custom_record?) ? 'lastModified' : 'lastModifiedDate'
+          opts[:netsuite_poll_field] ||= (klass.netsuite_custom_record?) ? 'lastModified' : 'lastModifiedDate'
 
           if opts[:updated_before].present?
             criteria << {
-              field: last_modified_field,
+              field: opts[:netsuite_poll_field],
               operator: 'within',
               value: [
                 opts[:last_poll],
@@ -115,7 +115,7 @@ module NetSuiteRails
             }
           else
             criteria << {
-              field: last_modified_field,
+              field: opts[:netsuite_poll_field],
               operator: 'after',
               value: opts[:last_poll]
             }
