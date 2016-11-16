@@ -108,6 +108,7 @@ module NetSuiteRails
             criteria << {
               field: opts[:netsuite_poll_field],
               operator: 'within',
+              type: 'SearchDateField',
               value: [
                 opts[:last_poll],
                 opts[:updated_before]
