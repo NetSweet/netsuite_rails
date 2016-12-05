@@ -68,6 +68,10 @@ describe NetSuiteRails::Transformations do
     netsuite_email = ' example,second@example.com '
     transformed_netsuite_email = NetSuiteRails::Transformations.email(netsuite_email, :push)
     expect(transformed_netsuite_email.to_s).to eq('examplesecond@example.com')
+
+    netsuite_email = 'boom.@gmail.com'
+    transformed_netsuite_email = NetSuiteRails::Transformations.email(netsuite_email, :push)
+    expect(transformed_netsuite_email.to_s).to eq('boom@gmail.com')
   end
 
   it 'truncates gift card code' do

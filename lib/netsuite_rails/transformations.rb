@@ -76,7 +76,9 @@ module NetSuiteRails
             # an error will be thrown if period is on the end of a sentence
             gsub(/[^A-Za-z]+$/, '').
             # any commas in the email with throw an error
-            gsub(',', '')
+            gsub(',', '').
+            # a period before the @ seems to cause issues
+            gsub('.@', '@')
 
           email
         else
