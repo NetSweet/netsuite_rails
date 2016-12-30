@@ -31,21 +31,14 @@ module NetSuiteRails
       def poll(klass, opts = {})
         opts = {
           import_all: false,
-          page_size: NetSuiteRails::Configuration.polling_page_size,
         }.merge(opts)
 
         opts[:netsuite_record_class] ||= klass.netsuite_record_class
         opts[:netsuite_custom_record_type_id] ||= klass.netsuite_custom_record_type_id if opts[:netsuite_record_class] == NetSuite::Records::CustomRecord
         opts[:saved_search_id] ||= klass.netsuite_sync_options[:saved_search_id]
-        opts[:body_fields_only] ||= false
 
         search = opts[:netsuite_record_class].search(
-          poll_criteria(klass, opts).merge({
-            preferences: {
-              body_fields_only: opts[:body_fields_only],
-              page_size: opts[:page_size]
-            }
-          })
+          poll_criteria(klass, opts)
         )
 
         # TODO more robust error reporting
@@ -57,6 +50,9 @@ module NetSuiteRails
       end
 
       def poll_criteria(klass, opts)
+        opts[:body_fields_only] ||= false
+        opts[:page_size] ||= NetSuiteRails::Configuration.polling_page_size
+
         search_criteria = {
           criteria: {
             basic: poll_basic_criteria(klass, opts)
@@ -74,6 +70,13 @@ module NetSuiteRails
             ],
           }
         end
+
+        search_criteria.merge!({
+          preferences: {
+            body_fields_only: opts[:body_fields_only],
+            page_size: opts[:page_size]
+          }
+        })
 
         search_criteria
       end
@@ -100,10 +103,12 @@ module NetSuiteRails
           }
         end
 
-        unless opts[:import_all]
-          # CustomRecordSearchBasic uses lastModified instead of the standard lastModifiedDate
-          opts[:netsuite_poll_field] ||= (klass.netsuite_custom_record?) ? 'lastModified' : 'lastModifiedDate'
+        # CustomRecordSearchBasic uses lastModified instead of the standard lastModifiedDate
+        opts[:netsuite_poll_field] ||= (klass.netsuite_custom_record?) ? 'lastModified' : 'lastModifiedDate'
 
+        # TODO investigate if defining a date range for `import_all` increases peformance
+
+        unless opts[:import_all]
           if opts[:updated_before].present?
             criteria << {
               field: opts[:netsuite_poll_field],
