@@ -81,8 +81,28 @@ describe NetSuiteRails::RecordSync::PollManager do
         ))
         .and_return(empty_search_results)
 
-      StandardRecord.netsuite_poll(last_poll: updated_after, netsuite_poll_field: 'lastQuantityAvailableChange')
+      StandardRecord.netsuite_poll(
+        last_poll: updated_after,
+        netsuite_poll_field: 'lastQuantityAvailableChange'
+      )
     end
+  end
+
+  it 'allows search preferences to be customized' do
+    expect(NetSuite::Records::Customer).to receive(:search)
+      .with(hash_including(
+        preferences: hash_including(
+          body_fields_only: true,
+          page_size: 13
+        )
+      ))
+      .and_return(empty_search_results)
+
+    StandardRecord.netsuite_poll(
+      import_all: true,
+      body_fields_only: true,
+      page_size: 13
+    )
   end
 
   skip "should poll and then get_list on saved search" do
