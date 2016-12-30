@@ -30,6 +30,7 @@ describe NetSuiteRails::RecordSync::PollManager do
             basic: array_including(
               {
                 field: 'lastModifiedDate',
+                type: 'SearchDateField',
                 operator: 'within',
                 value: [
                   updated_after,
