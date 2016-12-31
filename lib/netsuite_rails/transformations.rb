@@ -77,6 +77,8 @@ module NetSuiteRails
             gsub(/[^A-Za-z]+$/, '').
             # any commas in the email with throw an error
             gsub(',', '').
+            # double periods anywhere in the email cause issues
+            gsub('..', '.').
             # a period before the @ seems to cause issues
             gsub('.@', '@')
 
