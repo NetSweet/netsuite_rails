@@ -25,6 +25,8 @@ module NetSuiteRails
       # dependent record links
       # https://system.na1.netsuite.com/core/pages/itemchildrecords.nl?id=12413&t=InvtItem%05ProjectCostCategory&rectype=-10
       # https://system.na1.netsuite.com/app/accounting/transactions/payments.nl?id=91964&label=Customer+Refund&type=custrfnd&alllinks=T
+      
+#     # tax schedule: https://system.na1.netsuite.com/app/common/item/taxschedule.nl?id=1
 
       suffix = if is_custom_record
         "/common/custom/custrecordentry.nl?id=#{internal_id}&rectype=#{record.class.netsuite_custom_record_type_id}"
