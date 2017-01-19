@@ -6,12 +6,29 @@ module NetSuiteRails
         self.send(type, value, direction)
       end
 
+      def memo(memo, direction = :push)
+        if direction == :push
+          memo[0..999]
+        else
+          memo
+        end
+      end
+
       # gift certificate codes have a maximum of 9 characters
       def gift_card_code(code, direction = :push)
         if direction == :push
           code[0..8]
         else
           code
+        end
+      end
+
+      # company_name field has a 83 character limit
+      def company_name(company_name, direction = :push)
+        if direction == :push
+          company_name[0..82]
+        else
+          company_name
         end
       end
 
@@ -22,6 +39,11 @@ module NetSuiteRails
         else
           firstname
         end
+      end
+
+      # same limitations as firstname
+      def lastname(lastname, direction = :push)
+        firstname(lastname, direction)
       end
 
       def integer(number, direction = :push)
