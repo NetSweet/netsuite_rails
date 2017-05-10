@@ -42,8 +42,8 @@ module NetSuiteRails
           if match_data[:first_name] && match_data[:last_name] && !contact_first_name.empty? && !contact_last_name.empty?
 
             # TODO add logging for these interactions with NetSuite
-            if update_contact_email && order_payload[:email].present? && contact.email != order_payload[:email]
-              if !result.update(email: order_payload[:email])
+            if update_contact_email && contact_data[:email].present? && contact.email != contact_data[:email]
+              if !result.update(email: contact_data[:email])
                 raise "error updating email on contact"
               end
             end
@@ -68,8 +68,8 @@ module NetSuiteRails
               if update_contact_name
                 result = contact.update(
                   # use the first & last name from the payload; the match_data versions have been transformed
-                  first_name: order_payload[:shipping_address][:firstname],
-                  last_name: order_payload[:shipping_address][:lastname]
+                  first_name: contact_data[:firstname],
+                  last_name: contact_data[:lastname]
                 )
 
                 unless result
