@@ -1,5 +1,6 @@
 require 'netsuite'
 
+require 'netsuite_rails/errors'
 require 'netsuite_rails/configuration'
 require 'netsuite_rails/poll_timestamp' if defined?(::ActiveRecord)
 require 'netsuite_rails/transformations'
