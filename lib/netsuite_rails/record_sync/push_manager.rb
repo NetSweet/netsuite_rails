@@ -48,7 +48,7 @@ module NetSuiteRails
               netsuite_record.internal_id
             end
           else
-            raise "NetSuite: error. action=#{opts[:push_method]}, netsuite_record_type=#{netsuite_record.class}, errors=#{netsuite_record.errors}"
+            raise NetSuiteRails::Error, "action=#{opts[:push_method]}, netsuite_record_type=#{netsuite_record.class}, errors=#{netsuite_record.errors}"
           end
         end
 
@@ -107,7 +107,7 @@ module NetSuiteRails
           if netsuite_record.update(update_list)
             true
           else
-            raise "NetSuite: error updating record #{netsuite_record.errors}"
+            raise NetSuiteRails::Error, "error updating record #{netsuite_record.errors}"
           end
         end
 

@@ -111,7 +111,7 @@ module NetSuiteRails
         if local.respond_to?(:delay)
           local.delay.send(action, action_options)
         else
-          raise 'no supported delayed job method found'
+          raise NetSuiteRails::Error, 'no supported delayed job method found'
         end
       end
     end

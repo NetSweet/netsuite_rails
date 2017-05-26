@@ -44,7 +44,7 @@ module NetSuiteRails
             # TODO add logging for these interactions with NetSuite
             if update_contact_email && order_payload[:email].present? && contact.email != order_payload[:email]
               if !result.update(email: order_payload[:email])
-                raise "error updating email on contact"
+                raise NetSuiteRails::Error, "error updating email on contact"
               end
             end
 
@@ -73,7 +73,7 @@ module NetSuiteRails
                 )
 
                 unless result
-                  raise 'error updating name on contact placing order'
+                  raise NetSuiteRails::Error, 'error updating name on contact placing order'
                 end
               end
             end

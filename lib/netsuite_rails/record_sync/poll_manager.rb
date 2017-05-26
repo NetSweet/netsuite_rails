@@ -19,7 +19,7 @@ module NetSuiteRails
           end
 
           unless netsuite_batch
-            raise "NetSuite: #{klass}. Error running NS search. No Netsuite batch found. Most likely a search timeout."
+            raise NetSuiteRails::Error, "#{klass}. Error running NS search. No Netsuite batch found. Most likely a search timeout."
           end
 
           netsuite_batch.each do |netsuite_record|
@@ -43,7 +43,7 @@ module NetSuiteRails
 
         # TODO more robust error reporting
         unless search
-          raise "NetSuite: #{klass}. Error running NS search. Most likely a search timeout."
+          raise NetSuiteRails::Error, "#{klass}. Error running NS search. Most likely a search timeout."
         end
 
         process_search_results(klass, opts, search)
