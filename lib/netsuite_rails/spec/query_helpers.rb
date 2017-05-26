@@ -50,7 +50,7 @@ module NetSuiteRails
                   value: netsuite_timestamp
                 }
               ]
-            end + 
+            end +
 
             if [ NetSuite::Records::SalesOrder, NetSuite::Records::ItemFulfillment, NetSuite::Records::Invoice ].include?(record_class)
               [
@@ -70,15 +70,15 @@ module NetSuiteRails
         return nil if search.results.blank?
 
         if is_custom_record
-          NetSuite::Records::CustomRecord.get(
+          NetSuite::Utilities.backoff { NetSuite::Records::CustomRecord.get(
             internal_id: search.results.first.internal_id.to_i,
             type_id: record.class.netsuite_custom_record_type_id
-          )
+          ) }
         else
-          record_class.get(search.results.first.internal_id.to_i)
+          NetSuite::Utilities.backoff { record_class.get(search.results.first.internal_id.to_i) }
         end
       end
-      
+
       # convenience method for inspecting objects in a live IRB session
       def netsuite_url(object)
         `open "#{NetSuiteRails::UrlHelper.netsuite_url(object)}"`

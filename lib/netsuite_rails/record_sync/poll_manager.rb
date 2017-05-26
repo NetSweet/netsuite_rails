@@ -6,16 +6,16 @@ module NetSuiteRails
       def update_local_records(klass, opts = {})
         klass.select([:netsuite_id, :id]).find_in_batches(batch_size: NetSuiteRails::Configuration.polling_page_size) do |local_batch|
           netsuite_batch = if klass.netsuite_custom_record?
-            NetSuite::Records::CustomRecord.get_list(
+            NetSuite::Utilities.backoff { NetSuite::Records::CustomRecord.get_list(
               list: local_batch.map(&:netsuite_id),
               type_id: klass.netsuite_custom_record_type_id,
               allow_incomplete: true
-            )
+            ) }
           else
-            klass.netsuite_record_class.get_list(
+            NetSuite::Utilities.backoff { klass.netsuite_record_class.get_list(
               list: local_batch.map(&:netsuite_id),
               allow_incomplete: true
-            )
+            ) }
           end
 
           unless netsuite_batch
@@ -37,9 +37,9 @@ module NetSuiteRails
         opts[:netsuite_custom_record_type_id] ||= klass.netsuite_custom_record_type_id if opts[:netsuite_record_class] == NetSuite::Records::CustomRecord
         opts[:saved_search_id] ||= klass.netsuite_sync_options[:saved_search_id]
 
-        search = opts[:netsuite_record_class].search(
+        search = NetSuite::Utilities.backoff { opts[:netsuite_record_class].search(
           poll_criteria(klass, opts)
-        )
+        ) }
 
         # TODO more robust error reporting
         unless search
@@ -189,12 +189,12 @@ module NetSuiteRails
               Rails.logger.info "NetSuite: Syncing #{klass}. Running get_list for #{filtered_netsuite_id_list.length} records"
 
               if opts[:netsuite_record_class] == NetSuite::Records::CustomRecord
-                NetSuite::Records::CustomRecord.get_list(
+                NetSuite::Utilities.backoff { NetSuite::Records::CustomRecord.get_list(
                   list: filtered_netsuite_id_list,
                   type_id: opts[:netsuite_custom_record_type_id]
-                )
+                ) }
               else
-                opts[:netsuite_record_class].get_list(list: filtered_netsuite_id_list)
+                NetSuite::Utilities.backoff { opts[:netsuite_record_class].get_list(list: filtered_netsuite_id_list) }
               end
             else
               []

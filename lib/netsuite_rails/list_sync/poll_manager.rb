@@ -4,7 +4,7 @@ module NetSuiteRails
       extend self
 
       def poll(klass, opts = {})
-        custom_list = NetSuite::Records::CustomList.get(klass.netsuite_list_id)
+        custom_list = NetSuite::Utilities.backoff { NetSuite::Records::CustomList.get(klass.netsuite_list_id) }
 
         process_results(klass, opts, custom_list.custom_value_list.custom_value)
       end

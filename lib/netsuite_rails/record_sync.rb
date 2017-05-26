@@ -154,12 +154,12 @@ module NetSuiteRails
         # TODO support use_external_id / netsuite_external_id
 
         if netsuite_custom_record?
-          NetSuite::Records::CustomRecord.get(
+          NetSuite::Utilities.backoff { NetSuite::Records::CustomRecord.get(
             internal_id: self.netsuite_id,
             type_id: self.class.netsuite_custom_record_type_id
-          )
+          ) }
         else
-          self.netsuite_record_class.get(self.netsuite_id)
+          NetSuite::Utilities.backoff { self.netsuite_record_class.get(self.netsuite_id) }
         end
       end
 
