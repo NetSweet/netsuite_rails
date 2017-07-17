@@ -60,6 +60,7 @@ module NetSuiteRails
         NetSuite::Records::CustomerDeposit,
         NetSuite::Records::CustomerPayment,
         NetSuite::Records::CreditMemo,
+        NetSuite::Records::JournalEntry,
         NetSuite::Records::Deposit
         ].include?(record_class)
         "/accounting/transactions/transaction.nl?id=#{internal_id}"
