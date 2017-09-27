@@ -104,6 +104,10 @@ module NetSuiteRails
             # a period before the @ seems to cause issues
             gsub('.@', '@')
 
+          while email.count('@') > 1
+            email.sub!('@', '')
+          end
+
           email
         else
           email
