@@ -108,6 +108,13 @@ module NetSuiteRails
             email.sub!('@', '')
           end
 
+          if email.split('@').last.include?('&')
+            pieces = email.split('@')
+            first, last = pieces.first, pieces.last
+            last = last.sub('&', '')
+            email = [first, last].join('@')
+          end
+
           email
         else
           email
