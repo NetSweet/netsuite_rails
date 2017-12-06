@@ -84,6 +84,10 @@ describe NetSuiteRails::Transformations do
     netsuite_email = 'first@example.com,second@example.com,third@example.com,fourth@example.com'
     transformed_netsuite_email = NetSuiteRails::Transformations.email(netsuite_email, :push)
     expect(transformed_netsuite_email.to_s).to eq('firstexample.comsecondexample.comthirdexample.comfourth@example.com')
+
+    netsuite_email = "some\\@example.com"
+    transformed_netsuite_email = NetSuiteRails::Transformations.email(netsuite_email, :push)
+    expect(transformed_netsuite_email.to_s).to eq('some@example.com')
   end
 
   it 'truncates gift card code' do
