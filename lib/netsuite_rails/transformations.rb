@@ -102,7 +102,9 @@ module NetSuiteRails
             # double periods anywhere in the email cause issues
             gsub('..', '.').
             # a period before the @ seems to cause issues
-            gsub('.@', '@')
+            gsub('.@', '@').
+            # backslashes in an email cause issues
+            gsub("\\", '')
 
           while email.count('@') > 1
             email.sub!('@', '')
