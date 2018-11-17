@@ -206,7 +206,7 @@ module NetSuiteRails
           end
 
           if association_keys.include?(local_field)
-            field_value = reflection_attributes[local_field].
+            field_value = reflection_attributes[reflection_attributes.keys.first.class == String ? local_field.to_s : local_field].
               klass.
               where(netsuite_id: field_value.internal_id).
               first_or_initialize
