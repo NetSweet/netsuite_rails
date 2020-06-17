@@ -187,29 +187,39 @@ module NetSuiteRails
         association_keys = reflection_attributes.values.reject(&:collection?).map(&:name)
 
         all_field_list.each do |local_field, netsuite_field|
-          is_custom_field = custom_field_list.keys.include?(local_field)
-
           if netsuite_field.is_a?(Proc)
             netsuite_field.call(self, netsuite_record, :pull)
             next
           end
 
+          is_custom_field = custom_field_list.keys.include?(local_field)
+          is_association_field = association_keys.include?(local_field)
+
           field_value = if is_custom_field
-            netsuite_record.custom_field_list.send(netsuite_field).value rescue ""
+            # if a custom field is blank (empty string, or empty select box) the field will be omitted from the NS response
+            # because of this, we default to a blank string to ensure that local fields match the empty field value in NS
+
+            netsuite_record.custom_field_list.send(netsuite_field).value rescue ''
           else
+            # NS always returns a non-nil value for all standard fields
             netsuite_record.send(netsuite_field)
           end
 
+          # TODO this case should never occur: NS will return non-nil for all standard fields
+          #      and unset custom fields will always return a empty string, not a nil value
           if field_value.nil?
-            # TODO possibly nil out the local value?
-            next
+            fail "netsuite field value nil, non-nil value expected"
           end
 
-          if association_keys.include?(local_field)
-            field_value = reflection_attributes[local_field].
-              klass.
-              where(netsuite_id: field_value.internal_id).
-              first_or_initialize
+          if is_association_field
+            field_value = if field_value.blank?
+              nil
+            else
+              reflection_attributes[local_field].
+                klass.
+                where(netsuite_id: field_value.internal_id).
+                first_or_initialize
+            end
           elsif is_custom_field
             field_value = NetSuiteRails::RecordSync::PullManager.extract_custom_field_value(field_value)
           else
